@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>巴士到達 - KMB / CTB（無障礙＋快啟動＋簡易模式）</title>
+  <title>巴士到達 - KMB / CTB（螢幕閱讀 / 標準）</title>
 
   <style>
     :root{
@@ -22,9 +22,10 @@
       --focus:#fbbf24;
       --radius:16px;
       --shadow:0 12px 30px rgba(0,0,0,.35);
-      --minTap:44px; /* 手機友善觸控最少高度 */
+      --minTap:48px;
       --font: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";
     }
+
     *{ box-sizing:border-box; }
     html, body { height:100%; }
     body{
@@ -44,7 +45,11 @@
     }
     .skip-link:focus{ left:.75rem; top:.75rem; outline:3px solid var(--focus); }
 
-    .wrap{ max-width:520px; margin:0 auto; padding:16px 12px 28px; }
+    .wrap{
+      max-width:560px;
+      margin:0 auto;
+      padding:16px 12px 28px;
+    }
 
     header{
       background: linear-gradient(135deg, rgba(96,165,250,.25), rgba(59,130,246,.12));
@@ -54,8 +59,8 @@
       padding:18px 16px;
       margin-top:10px;
     }
-    header h1{ margin:0 0 6px; font-size:1.4rem; letter-spacing:.2px; }
-    header p{ margin:0; color:var(--muted); font-size:.95rem; }
+    header h1{ margin:0; font-size:1.35rem; letter-spacing:.2px; }
+    header p{ margin:.35rem 0 0; color:var(--muted); font-size:.95rem; }
 
     main{
       margin-top:14px;
@@ -64,10 +69,11 @@
       border-radius: var(--radius);
       box-shadow: var(--shadow);
       padding:14px;
+      position:relative;
     }
 
     .group{ margin-bottom:14px; }
-    label{ display:block; font-weight:800; margin-bottom:8px; }
+    label{ display:block; font-weight:1000; margin-bottom:8px; }
 
     input, select, button{ font: inherit; }
 
@@ -81,6 +87,7 @@
       color:var(--text);
       outline:none;
     }
+
     .select{
       appearance:none;
       background-image:
@@ -93,6 +100,7 @@
       background-repeat:no-repeat;
       padding-right:44px;
     }
+
     .input:focus, .select:focus, button:focus{
       outline:3px solid var(--focus);
       outline-offset:2px;
@@ -110,7 +118,7 @@
       padding:10px 12px;
       background: rgba(18,32,68,.75);
       color:var(--text);
-      font-weight:900;
+      font-weight:1000;
       cursor:pointer;
       display:inline-flex;
       align-items:center;
@@ -118,10 +126,15 @@
       gap:8px;
       width:100%;
       user-select:none;
+      -webkit-tap-highlight-color: transparent;
     }
     .btn.primary{
       background: linear-gradient(135deg, rgba(96,165,250,.35), rgba(59,130,246,.25));
       border-color: rgba(96,165,250,.55);
+    }
+    .btn.warn{
+      background: linear-gradient(135deg, rgba(251,191,36,.22), rgba(251,191,36,.10));
+      border-color: rgba(251,191,36,.45);
     }
     .btn:disabled{ opacity:.55; cursor:not-allowed; }
 
@@ -131,7 +144,8 @@
       padding:12px;
       background: rgba(15,26,51,.75);
     }
-    .dest{ font-size:1rem; font-weight:900; color: var(--primary); }
+
+    .dest{ font-size:1rem; font-weight:1000; color: var(--primary); }
 
     .statusBox{
       margin:10px 0 0;
@@ -143,7 +157,7 @@
     .statusBox.success{ border-color: rgba(52,211,153,.5); }
     .statusBox.error{ border-color: rgba(251,113,133,.5); }
     .statusBox.info{ border-color: rgba(96,165,250,.5); }
-    .statusTitle{ font-weight:900; margin:0 0 4px; }
+    .statusTitle{ font-weight:1000; margin:0 0 4px; }
     .statusText{ margin:0; color:var(--muted); }
 
     .loading{
@@ -164,8 +178,8 @@
       background: rgba(18,32,68,.55);
       margin-bottom:10px;
     }
-    .etaTime{ font-size:1.25rem; font-weight:900; color: var(--primary); }
-    .etaCountdown{ color: var(--muted); font-weight:700; }
+    .etaTime{ font-size:1.2rem; font-weight:1000; color: var(--primary); }
+    .etaCountdown{ color: var(--muted); font-weight:1000; }
     .etaRemark{ color: var(--muted2); font-size:.92rem; }
 
     .sr-only{
@@ -176,28 +190,85 @@
       white-space:nowrap; border:0;
     }
 
+    /* ===== Mode rules ===== */
+    body.mode-sr .standard-only{ display:none !important; }
+    body.mode-std .sr-only-ui{ display:none !important; }
+
+    /* SR mode: visually quiet */
+    body.mode-sr header p{ display:none; }
+    body.mode-sr .hint{ display:none !important; }
+    body.mode-sr .statusBox{ display:none !important; }
+
+    /* Simple card */
+    #simpleCard{ display:none; }
+    #simpleMain{
+      font-size:2.0rem;
+      font-weight:1100;
+      color:var(--primary);
+      letter-spacing:.2px;
+    }
+
+    /* ===== Right-side control rail ===== */
+    .rail{
+      position:fixed;
+      right: max(10px, env(safe-area-inset-right));
+      top: 110px;
+      z-index: 999;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      width: 150px;
+    }
+    .rail .btn{
+      width:150px;
+      border-radius:16px;
+      box-shadow: 0 10px 24px rgba(0,0,0,.28);
+    }
+    .railTitle{
+      font-size:.9rem;
+      color:var(--muted2);
+      font-weight:1000;
+      text-align:center;
+      margin-bottom:4px;
+    }
+
+    @media (max-width: 640px){
+      .rail{
+        right: max(8px, env(safe-area-inset-right));
+        top: auto;
+        bottom: max(10px, env(safe-area-inset-bottom));
+        width: 140px;
+      }
+      .rail .btn{ width:140px; }
+    }
+
     @media (prefers-reduced-motion: reduce){
       *{ scroll-behavior:auto !important; transition:none !important; animation:none !important; }
     }
   </style>
 </head>
 
-<body>
+<body class="mode-sr">
   <a class="skip-link" href="#main">跳到主要內容</a>
 
   <div class="wrap">
-    <header role="banner" aria-label="應用程式標題">
-      <h1>🚌 巴士到達（簡易模式＋快啟動）</h1>
-      <p>支援 VoiceOver / TalkBack｜本機 cache 加速｜只顯示最快一班（粵語讀屏）</p>
+    <header role="banner" aria-label="標題">
+      <h1>🚌 巴士到達（KMB / CTB）</h1>
+      <p class="standard-only">螢幕閱讀／標準</p>
     </header>
 
-    <!-- Live regions: status=polite, alert=assertive -->
+    <!-- Live regions -->
     <div id="srStatus" class="sr-only" role="status" aria-atomic="true"></div>
     <div id="srAlert" class="sr-only" role="alert" aria-atomic="true"></div>
 
     <main id="main" role="main" aria-label="巴士到站查詢">
-      <section class="group" aria-label="路線選擇">
-        <label for="routeInput">巴士路線</label>
+      <!-- Mode toggle (standard mode only, minimal text) -->
+      <section class="group standard-only" aria-label="模式">
+        <button id="modeToggleTop" class="btn warn" aria-label="切換模式">模式：螢幕閱讀</button>
+      </section>
+
+      <section class="group" aria-label="路線">
+        <label for="routeInput">路線</label>
         <input
           id="routeInput"
           class="input"
@@ -205,120 +276,115 @@
           inputmode="text"
           autocomplete="off"
           placeholder="例如：1A / 101 / A21"
-          aria-describedby="routeHint"
+          aria-label="輸入路線"
         />
         <datalist id="routes"></datalist>
-        <div id="routeHint" class="hint">
-          輸入路線後會載入目的地同巴士站。系統會讀出「而家更新緊」同「已經更新」。
-        </div>
       </section>
 
-      <section class="group" aria-label="目的地與公司">
+      <section class="group" aria-label="目的地">
         <div class="card" id="destinationCard">
-          <div class="dest" id="destinationText">請先輸入路線</div>
-          <div class="hint" id="destinationHint">目的地會喺你揀咗路線之後顯示</div>
+          <div class="dest" id="destinationText">請輸入路線</div>
         </div>
 
-        <div class="row" style="margin-top:10px;">
-          <button id="toggleDirectionBtn" class="btn" disabled aria-label="切換目的地方向">🔄 切換目的地</button>
-          <button id="toggleCompanyBtn" class="btn" disabled aria-label="切換公司模式：自動、KMB、城巴">🏢 公司：自動</button>
+        <!-- In-content buttons (standard mode only) -->
+        <div class="row standard-only" style="margin-top:10px;">
+          <button id="toggleDirectionBtn" class="btn" disabled aria-label="切換方向">🔁 方向</button>
+          <button id="toggleCompanyBtn" class="btn" disabled aria-label="切換公司">🏢 公司</button>
         </div>
       </section>
 
-      <section class="group" aria-label="巴士站選擇">
+      <section class="group" aria-label="巴士站">
         <label for="stopSelect">巴士站</label>
-        <select id="stopSelect" class="select" aria-describedby="stopHint">
-          <option value="">請先選擇路線同目的地</option>
+        <select id="stopSelect" class="select" aria-label="選擇巴士站">
+          <option value="">先揀路線</option>
         </select>
-        <div id="stopHint" class="hint">
-          揀咗巴士站之後，會只顯示「最快一班」到站時間。系統亦會嘗試用定位自動揀最近嘅站。
-        </div>
       </section>
 
-      <div id="statusBox" class="statusBox info" style="display:none;" aria-label="系統狀態提示">
-        <p class="statusTitle" id="statusTitle">提示</p>
+      <!-- Visible status box only in standard mode -->
+      <div id="statusBox" class="statusBox info standard-only" style="display:none;" aria-label="狀態">
+        <p class="statusTitle" id="statusTitle">狀態</p>
         <p class="statusText" id="statusText"></p>
       </div>
 
-      <div id="loadingBox" class="loading" aria-label="正在載入" aria-busy="false">
-        <strong>正在載入…</strong>
-        <div class="hint">資料更新中。</div>
+      <div id="loadingBox" class="loading" aria-label="載入中" aria-busy="false">
+        <strong>載入中…</strong>
       </div>
 
-      <!-- Simple Mode Card -->
-      <section id="simpleCard" class="card" aria-label="最快一班到站時間" style="display:none;">
-        <div style="font-weight:900; font-size:1.05rem; margin-bottom:6px;">最快一班</div>
-        <div id="simpleMain" style="font-size:1.9rem; font-weight:900; color: var(--primary);">—</div>
-        <div id="simpleSub" class="hint" style="margin-top:6px;">—</div>
-        <div class="row" style="margin-top:12px;">
-          <button id="refreshEtaBtn" class="btn primary" aria-label="立即更新到站時間">🔄 立即更新</button>
+      <!-- Next bus card (shown in both modes) -->
+      <section id="simpleCard" class="card" aria-label="最快一班" style="display:none;">
+        <div style="font-weight:1100; font-size:1.05rem; margin-bottom:6px;">最快一班</div>
+        <div id="simpleMain">—</div>
+        <div id="simpleSub" class="hint standard-only" style="margin-top:6px;">—</div>
+        <div class="row standard-only" style="margin-top:12px;">
+          <button id="refreshEtaBtn" class="btn primary" aria-label="更新">🔄 更新</button>
         </div>
       </section>
 
-      <!-- (Optional) Full list kept but hidden by default -->
-      <section class="etaList" id="etaList" aria-label="到站時間結果（完整）" aria-live="off"></section>
+      <!-- Full list (standard mode only) -->
+      <section class="etaList standard-only" id="etaList" aria-label="完整到站時間" aria-live="off"></section>
 
       <section id="emptyState" class="card" aria-label="提示">
-        <strong>請輸入路線，再揀巴士站。</strong>
-        <div class="hint">盲人/視障用家可以用讀屏功能，系統會讀出更新狀態同最快一班幾耐到。</div>
+        <strong>輸入路線，再揀站。</strong>
       </section>
     </main>
   </div>
 
-<script>
-/* =========================================================
-   Fast boot + Local cache (TTL + stale-while-revalidate)
-   - Low-change data cached locally: routes, stops, route-stops, stop details
-   - ETA NEVER cached
-   - SWR idea: use cached immediately, refresh in background [1](https://web.dev/articles/stale-while-revalidate)
-   - TTL expiry pattern for localStorage [2](https://app.studyraid.com/en/read/12378/399703/cache-invalidation-approaches)
-========================================================= */
+  <!-- Right rail -->
+  <nav class="rail" aria-label="主要操作">
+    <div class="railTitle">操作</div>
 
-// --- Config ---
-const SIMPLE_MODE = true;
-const APP_NS = 'buseta_a11y_v6'; // bump to invalidate old cache when code changes
+    <button id="modeToggleRail" class="btn warn" aria-label="切換模式">螢幕閱讀</button>
+
+    <button id="railRefresh" class="btn primary" aria-label="更新">🔄 更新</button>
+
+    <button id="railFocusStop" class="btn" aria-label="去揀站">📍 揀站</button>
+
+    <button id="railFocusRoute" class="btn" aria-label="去輸入路線">🚌 路線</button>
+
+    <button id="railToggleDir" class="btn" aria-label="切換方向" disabled>🔁 方向</button>
+
+    <button id="railToggleCompany" class="btn" aria-label="切換公司" disabled>🏢 公司</button>
+  </nav>
+
+<script>
+/* =========================
+   Fast boot + local cache (TTL + SWR)
+   - Cache: routes / stops / route-stops / stop detail
+   - NEVER cache ETA
+========================= */
+
+const APP_NS = 'buseta_a11y_v8';
 const NOW = () => Date.now();
 
-// TTL plan (ms)
-// routes: 7 days, stops: 30 days, route-stops: 7 days, stop detail: 30 days
 const TTL = {
   KMB_ROUTES: 7 * 24 * 60 * 60 * 1000,
   KMB_STOPS: 30 * 24 * 60 * 60 * 1000,
   KMB_ROUTE_STOPS: 7 * 24 * 60 * 60 * 1000,
   KMB_STOP_DETAIL: 30 * 24 * 60 * 60 * 1000,
-
   CTB_ROUTES: 7 * 24 * 60 * 60 * 1000,
   CTB_ROUTE_STOPS: 7 * 24 * 60 * 60 * 1000,
   CTB_STOP_DETAIL: 30 * 24 * 60 * 60 * 1000
 };
 
-// SWR: even if not expired, do background refresh after this window
 const REVALIDATE_AFTER = {
-  ROUTES: 12 * 60 * 60 * 1000,      // 12 hours
-  STOPS: 24 * 60 * 60 * 1000,       // 24 hours
-  ROUTE_STOPS: 12 * 60 * 60 * 1000, // 12 hours
-  STOP_DETAIL: 24 * 60 * 60 * 1000  // 24 hours
+  ROUTES: 12 * 60 * 60 * 1000,
+  STOPS: 24 * 60 * 60 * 1000,
+  ROUTE_STOPS: 12 * 60 * 60 * 1000,
+  STOP_DETAIL: 24 * 60 * 60 * 1000
 };
 
-// Cantonese readout strings
 const CANTO = {
-  loadingRoutes: '而家載入緊巴士路線。',
-  loadingCache: '而家讀緊本機快取資料。',
-  updatingRoute: '而家更新緊路線資料。',
-  updatingStops: '而家更新緊巴士站。',
-  findingNearest: '而家幫你揀最近嘅巴士站。',
-  updatingEta: '而家更新緊到站時間。',
-  updatedEta: '已經更新到站時間。',
-  noService: '短時間內冇巴士。',
-  routeNotFound: '搵唔到呢條巴士路線。',
-  locationDenied: '定位用唔到，請自己揀巴士站。',
-  etaError: '讀取到站時間失敗。'
+  updating: '更新緊',
+  updated: '已更新',
+  noService: '冇班次',
+  routeNotFound: '搵唔到路線',
+  locationDenied: '定位用唔到',
+  etaError: '更新失敗'
 };
 
-// --- DOM helpers ---
 const el = (id) => document.getElementById(id);
 
-// --- Screen reader announcers (status=polite, alert=assertive) [4](https://vtcstaff-my.sharepoint.com/personal/mattkung_vtc_edu_hk/_layouts/15/Doc.aspx?sourcedoc=%7B0065A268-8393-4D5B-A46C-7E50595A8C05%7D&file=T18%20(Security5)%20-%20Netiquette%20and%20Equity%20(students).pptx&action=edit&mobileredirect=true&DefaultItemOpen=1)[5](https://vtcstaff-my.sharepoint.com/personal/mattkung_vtc_edu_hk/_layouts/15/Doc.aspx?sourcedoc=%7B322CAD8B-FFB0-446C-8023-4E5B395932C5%7D&file=Appendix%205D_Special%20Assessment%20Arrangements%20(Chi)%20form%20FT%20DVES3_FS113386.doc&action=default&mobileredirect=true&DefaultItemOpen=1)[6](https://vtcstaff-my.sharepoint.com/personal/mattkung_vtc_edu_hk/Documents/Microsoft%20Copilot%20%E8%81%8A%E5%A4%A9%E6%AA%94%E6%A1%88/index.html)
+// live regions
 function announceStatus(msg){
   const node = el('srStatus');
   node.textContent = '';
@@ -329,29 +395,57 @@ function announceAlert(msg){
   node.textContent = '';
   setTimeout(() => node.textContent = msg, 20);
 }
-function showVisibleStatus(message, type='info', title='提示'){
+
+function showVisibleStatus(message, type='info', title='狀態'){
   const box = el('statusBox');
+  if (!box) return;
   el('statusTitle').textContent = title;
   el('statusText').textContent = message;
-  box.className = 'statusBox ' + type;
+  box.className = 'statusBox ' + type + ' standard-only';
   box.style.display = 'block';
-  if(type === 'error') announceAlert(message);
-  else announceStatus(message);
-  setTimeout(() => { box.style.display = 'none'; }, 4500);
+  setTimeout(() => { box.style.display = 'none'; }, 3000);
 }
-function setLoading(show, srText){
+
+function setLoading(show){
   const box = el('loadingBox');
   box.className = show ? 'loading show' : 'loading';
   box.setAttribute('aria-busy', show ? 'true' : 'false');
-  if (srText) announceStatus(srText);
 }
 
-// --- Storage (localStorage with TTL + version) [2](https://app.studyraid.com/en/read/12378/399703/cache-invalidation-approaches)
+/* ===== Mode ===== */
+const MODE_KEY = 'buseta_mode'; // 'sr' or 'std'
+function getMode(){
+  const m = localStorage.getItem(MODE_KEY);
+  return (m === 'std' || m === 'sr') ? m : 'sr';
+}
+function setMode(mode){
+  localStorage.setItem(MODE_KEY, mode);
+  document.body.classList.toggle('mode-sr', mode === 'sr');
+  document.body.classList.toggle('mode-std', mode === 'std');
+
+  // minimal labels
+  const rail = el('modeToggleRail');
+  const top = el('modeToggleTop');
+  if (mode === 'sr'){
+    rail.textContent = '螢幕閱讀';
+    if (top) top.textContent = '模式：螢幕閱讀';
+    announceStatus('螢幕閱讀模式');
+  }else{
+    rail.textContent = '標準';
+    if (top) top.textContent = '模式：標準';
+    announceStatus('標準模式');
+  }
+}
+function toggleMode(){
+  setMode(getMode() === 'sr' ? 'std' : 'sr');
+}
+
+/* ===== Storage helpers (localStorage TTL) ===== */
 const memStore = new Map();
 
 function storageAvailable(){
   try{
-    const k = '__t__';
+    const k='__t__';
     localStorage.setItem(k,'1');
     localStorage.removeItem(k);
     return true;
@@ -360,7 +454,6 @@ function storageAvailable(){
   }
 }
 const HAS_LS = storageAvailable();
-
 function k(key){ return `${APP_NS}:${key}`; }
 
 function safeSetItem(key, value){
@@ -368,7 +461,6 @@ function safeSetItem(key, value){
     localStorage.setItem(key, value);
     return true;
   }catch(e){
-    // Quota exceeded: clear our namespace only
     try{
       Object.keys(localStorage).forEach(kk => { if (kk.startsWith(APP_NS + ':')) localStorage.removeItem(kk); });
       localStorage.setItem(key, value);
@@ -381,13 +473,7 @@ function safeSetItem(key, value){
 
 function cacheSet(key, data, ttlMs){
   const now = NOW();
-  const item = {
-    v: 1,
-    ver: APP_NS,
-    ts: now,
-    exp: now + ttlMs,
-    data
-  };
+  const item = { ver:APP_NS, ts:now, exp:now+ttlMs, data };
   const str = JSON.stringify(item);
   if (HAS_LS) safeSetItem(k(key), str);
   else memStore.set(k(key), str);
@@ -400,48 +486,10 @@ function cacheGet(key){
     const item = JSON.parse(raw);
     if (!item || item.ver !== APP_NS) return { hit:false };
     const now = NOW();
-    const expired = now > item.exp;
-    return { hit:true, expired, ts:item.ts, data:item.data };
+    return { hit:true, expired: now > item.exp, ts:item.ts, data:item.data };
   }catch(e){
     return { hit:false };
   }
-}
-
-// stale-while-revalidate fetch JSON
-async function cacheFetchJSON(key, url, ttlMs, revalidateAfterMs, fetchInit){
-  const c = cacheGet(key);
-
-  // Serve cache immediately if present & not expired
-  if (c.hit && !c.expired){
-    const age = NOW() - (c.ts || 0);
-    // Background revalidate if too old
-    if (age > revalidateAfterMs){
-      (async () => {
-        try{
-          const fresh = await fetchJSON(url, fetchInit);
-          cacheSet(key, fresh, ttlMs);
-        }catch(_){}
-      })();
-    }
-    return c.data;
-  }
-
-  // If cache exists but expired: return stale immediately, revalidate in foreground
-  if (c.hit && c.expired){
-    // Return stale right now (fast), but also do a real fetch (wait) to update
-    (async () => {
-      try{
-        const fresh = await fetchJSON(url, fetchInit);
-        cacheSet(key, fresh, ttlMs);
-      }catch(_){}
-    })();
-    return c.data;
-  }
-
-  // No cache: fetch from network and store
-  const fresh = await fetchJSON(url, fetchInit);
-  cacheSet(key, fresh, ttlMs);
-  return fresh;
 }
 
 async function fetchJSON(url, init){
@@ -450,7 +498,39 @@ async function fetchJSON(url, init){
   return r.json();
 }
 
-// --- small concurrency limiter for stop detail calls ---
+// stale-while-revalidate
+async function cacheFetchJSON(key, url, ttlMs, revalidateAfterMs, init){
+  const c = cacheGet(key);
+
+  if (c.hit && !c.expired){
+    const age = NOW() - (c.ts || 0);
+    if (age > revalidateAfterMs){
+      (async () => {
+        try{
+          const fresh = await fetchJSON(url, init);
+          cacheSet(key, fresh, ttlMs);
+        }catch(_){}
+      })();
+    }
+    return c.data;
+  }
+
+  if (c.hit && c.expired){
+    (async () => {
+      try{
+        const fresh = await fetchJSON(url, init);
+        cacheSet(key, fresh, ttlMs);
+      }catch(_){}
+    })();
+    return c.data;
+  }
+
+  const fresh = await fetchJSON(url, init);
+  cacheSet(key, fresh, ttlMs);
+  return fresh;
+}
+
+// small concurrency limiter
 async function mapLimit(arr, limit, worker){
   const ret = [];
   let i = 0;
@@ -464,7 +544,7 @@ async function mapLimit(arr, limit, worker){
   return ret;
 }
 
-// --- App helpers ---
+/* ===== Helpers ===== */
 function calculateDistance(lat1, lon1, lat2, lon2) {
   const R = 6371;
   const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -476,29 +556,6 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
   return R * c;
 }
 
-function formatEtaBlock(etaIso, dataTsIso, remark) {
-  if (!etaIso) {
-    return { timeText: '短時間內冇巴士', countdownText: '', remarkText: remark || '' , isNoService:true };
-  }
-  const etaD = new Date(etaIso);
-  const nowD = new Date(dataTsIso || Date.now());
-  const diff = Math.floor((etaD - nowD) / 1000);
-  const min = Math.floor(diff / 60);
-  const sec = Math.abs(diff % 60);
-  let countdown = `${min}分${sec < 10 ? '0' + sec : sec}秒`;
-  if (min < -10) countdown = '短時間內冇巴士';
-  const hrRaw = etaD.getHours();
-  const hr = hrRaw > 12 ? hrRaw - 12 : (hrRaw === 0 ? 12 : hrRaw);
-  const mm = etaD.getMinutes() < 10 ? '0' + etaD.getMinutes() : etaD.getMinutes();
-  const ap = hrRaw >= 12 ? 'PM' : 'AM';
-  return {
-    timeText: `${hr}:${mm} ${ap}`,
-    countdownText: countdown === '短時間內冇巴士' ? '' : `距離抵達 ${countdown}`,
-    remarkText: remark || '實時班次',
-    isNoService: countdown === '短時間內冇巴士'
-  };
-}
-
 function speakCountdown(min, sec){
   if (min <= 0 && sec > 0) return `仲有${sec}秒到`;
   if (min > 0 && sec > 0) return `仲有${min}分${sec}秒到`;
@@ -506,7 +563,6 @@ function speakCountdown(min, sec){
   return '就到';
 }
 
-// Pick the “soonest valid bus” from validEtas (ETA NEVER cached)
 function pickNextBus(validEtas){
   let best = null;
   let bestSec = Infinity;
@@ -526,26 +582,18 @@ function pickNextBus(validEtas){
 function getCurrentLocation() {
   return new Promise((resolve, reject) => {
     if (!navigator.geolocation) {
-      reject(new Error('此瀏覽器唔支援定位'));
+      reject(new Error('定位不可用'));
       return;
     }
     navigator.geolocation.getCurrentPosition(
       (pos) => resolve({ latitude: pos.coords.latitude, longitude: pos.coords.longitude }),
-      (error) => {
-        let msg = '無法獲取位置';
-        switch (error.code) {
-          case error.PERMISSION_DENIED: msg = CANTO.locationDenied; break;
-          case error.POSITION_UNAVAILABLE: msg = '位置資訊攞唔到，請自己揀巴士站'; break;
-          case error.TIMEOUT: msg = '定位超時，請自己揀巴士站'; break;
-        }
-        reject(new Error(msg));
-      },
+      (_) => reject(new Error(CANTO.locationDenied)),
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000 }
     );
   });
 }
 
-// --- Providers (with caching) ---
+/* ===== Providers ===== */
 const KMB = {
   base: 'https://data.etabus.gov.hk/v1/transport/kmb',
   async fetchStopsMap() {
@@ -587,7 +635,6 @@ const KMB = {
     return { stop: stopId, name_tc: d.name_tc, lat: parseFloat(d.lat), long: parseFloat(d.long) };
   },
   async fetchEta(stopId, route) {
-    // NEVER cached
     const r = await fetch(`${this.base}/eta/${stopId}/${route}/1`, { cache:'no-store' });
     const j = await r.json();
     return j.data || [];
@@ -597,7 +644,7 @@ const KMB = {
 const CTB = {
   base: 'https://rt.data.gov.hk/v2/transport/citybus',
   companyId: 'CTB',
-  _stopCacheMem: new Map(), // in-memory hot cache
+  _stopCacheMem: new Map(),
   async fetchRoutes() {
     const j = await cacheFetchJSON(
       'ctb:routes',
@@ -621,9 +668,7 @@ const CTB = {
     return j.data || [];
   },
   async fetchStopDetail(stopId) {
-    // memory first
     if (this._stopCacheMem.has(stopId)) return this._stopCacheMem.get(stopId);
-
     const key = `ctb:stopDetail:${stopId}`;
     const j = await cacheFetchJSON(
       key,
@@ -637,31 +682,31 @@ const CTB = {
     return detail;
   },
   async fetchEta(stopId, route) {
-    // NEVER cached
     const r = await fetch(`${this.base}/eta/${this.companyId}/${stopId}/${route}`, { cache:'no-store' });
     const j = await r.json();
     return j.data || [];
   }
 };
 
-// --- Global state ---
+/* ===== App state ===== */
 let kmbStopsMap = {};
 let kmbRoutesData = [];
 let ctbRoutesData = [];
 let kmbRoutesSet = new Set();
 let ctbRoutesSet = new Set();
 let ctbRouteMap = new Map();
-let currentDirection = 'outbound'; // outbound/inbound
-let companyMode = 'AUTO'; // AUTO KMB CTB
+let currentDirection = 'outbound';
+let companyMode = 'AUTO';
 let resolvedCompany = null;
 
-function companyLabel(mode) {
+function companyLabel(mode){
   if (mode === 'AUTO') return '自動';
   if (mode === 'KMB') return 'KMB';
   if (mode === 'CTB') return '城巴';
   return mode;
 }
-function resolveCompanyForRoute(route) {
+
+function resolveCompanyForRoute(route){
   const inKMB = kmbRoutesSet.has(route);
   const inCTB = ctbRoutesSet.has(route);
   if (!inKMB && !inCTB) return null;
@@ -672,66 +717,77 @@ function resolveCompanyForRoute(route) {
   if (companyMode === 'CTB') return 'CTB';
   return 'KMB';
 }
-function updateCompanyButtonLabel(route) {
-  const btn = el('toggleCompanyBtn');
-  btn.textContent = `🏢 公司：${companyLabel(companyMode)}`;
-  btn.disabled = !route;
-}
-function updateDestination(route) {
-  const dest = el('destinationText');
-  const toggleDirBtn = el('toggleDirectionBtn');
 
-  if (!route || !resolvedCompany) {
-    dest.textContent = '請先輸入路線';
-    toggleDirBtn.disabled = true;
+function updateButtons(route){
+  const inBtn = el('toggleCompanyBtn');
+  const railBtn = el('railToggleCompany');
+  const text = `🏢 ${companyLabel(companyMode)}`;
+  inBtn.textContent = `🏢 公司：${companyLabel(companyMode)}`;
+  railBtn.textContent = text;
+
+  const disabled = !route;
+  inBtn.disabled = disabled;
+  railBtn.disabled = disabled;
+}
+
+function updateDirectionButtons(enabled){
+  el('toggleDirectionBtn').disabled = !enabled;
+  el('railToggleDir').disabled = !enabled;
+}
+
+function updateDestination(route){
+  const dest = el('destinationText');
+  if (!route || !resolvedCompany){
+    dest.textContent = '請輸入路線';
+    updateDirectionButtons(false);
     return;
   }
-  if (resolvedCompany === 'KMB') {
+
+  if (resolvedCompany === 'KMB'){
     const rows = kmbRoutesData.filter(i => String(i.route).toUpperCase() === route);
     const currentInfo = rows.find(i => i.bound === (currentDirection === 'outbound' ? 'O' : 'I')) || rows[0];
-    if (currentInfo) {
+    if (currentInfo){
       dest.textContent = `🎯 ${currentInfo.dest_tc}`;
-      toggleDirBtn.disabled = rows.length < 2;
-    } else {
-      dest.textContent = '請先輸入路線';
-      toggleDirBtn.disabled = true;
+      updateDirectionButtons(true);
+    }else{
+      dest.textContent = '請輸入路線';
+      updateDirectionButtons(false);
     }
     return;
   }
-  if (resolvedCompany === 'CTB') {
+
+  if (resolvedCompany === 'CTB'){
     const info = ctbRouteMap.get(route);
-    if (info) {
+    if (info){
       const text = (currentDirection === 'outbound')
         ? (info.dest_tc || info.dest_en || route)
         : (info.orig_tc || info.orig_en || route);
       dest.textContent = `🎯 ${text}`;
-      toggleDirBtn.disabled = false;
-    } else {
-      dest.textContent = '請先輸入路線';
-      toggleDirBtn.disabled = true;
+      updateDirectionButtons(true);
+    }else{
+      dest.textContent = '請輸入路線';
+      updateDirectionButtons(false);
     }
     return;
   }
 }
 
-// --- Auto find nearest stop ---
-async function autoFindClosestStop(route) {
+// auto nearest stop
+async function autoFindClosestStop(route){
   const stopSelect = el('stopSelect');
   if (!route || !resolvedCompany) return;
   if (!stopSelect.options || stopSelect.options.length <= 1) return;
 
-  try {
-    setLoading(true, CANTO.findingNearest);
-    showVisibleStatus('而家幫你揀最近嘅巴士站…', 'info', '定位');
-
+  try{
+    announceStatus(CANTO.updating);
     const userLocation = await getCurrentLocation();
 
     let stopsWithCoords = [];
-    if (resolvedCompany === 'KMB') {
+    if (resolvedCompany === 'KMB'){
       const routeStops = await KMB.fetchRouteStops(route, currentDirection);
       const ps = routeStops.map(st => KMB.fetchStopDetail(st.stop).then(d => ({...st, ...d})));
       stopsWithCoords = await Promise.all(ps);
-    } else {
+    }else{
       const routeStops = await CTB.fetchRouteStops(route, currentDirection);
       const ps = routeStops.map(st => CTB.fetchStopDetail(st.stop).then(d => ({...st, ...d})));
       stopsWithCoords = await Promise.all(ps);
@@ -741,48 +797,87 @@ async function autoFindClosestStop(route) {
     let minDistance = Infinity;
 
     stopsWithCoords.forEach(stop => {
-      if (Number.isFinite(stop.lat) && Number.isFinite(stop.long)) {
+      if (Number.isFinite(stop.lat) && Number.isFinite(stop.long)){
         const distance = calculateDistance(userLocation.latitude, userLocation.longitude, stop.lat, stop.long);
-        if (distance < minDistance) {
+        if (distance < minDistance){
           minDistance = distance;
           closestStop = stop;
         }
       }
     });
 
-    if (closestStop) {
+    if (closestStop){
       stopSelect.value = closestStop.stop;
       stopSelect.dispatchEvent(new Event('change'));
-      const distanceText = minDistance < 1 ? `${Math.round(minDistance * 1000)}米` : `${minDistance.toFixed(1)}公里`;
-      showVisibleStatus(`已自動揀咗最近嘅站（距離：${distanceText}）`, 'success', '完成');
-    } else {
-      throw new Error('搵唔到有座標嘅巴士站');
     }
-  } catch (err) {
-    showVisibleStatus(err.message || CANTO.locationDenied, 'error', '錯誤');
-  } finally {
-    setLoading(false, '定位流程完成');
+  }catch(_){
+    // silent
   }
 }
 
-// --- Bootstrap ---
+/* ===== Start ===== */
 document.addEventListener('DOMContentLoaded', async () => {
+  // init mode
+  setMode(getMode());
+
+  // mode toggles
+  el('modeToggleRail').addEventListener('click', toggleMode);
+  const topToggle = el('modeToggleTop');
+  if (topToggle) topToggle.addEventListener('click', toggleMode);
+
   const routeInput = el('routeInput');
   const stopSelect = el('stopSelect');
   const routesDatalist = el('routes');
   const etaList = el('etaList');
   const simpleCard = el('simpleCard');
 
-  el('emptyState').style.display = 'block';
-  updateCompanyButtonLabel('');
+  // rail actions
+  el('railFocusRoute').addEventListener('click', () => routeInput.focus());
+  el('railFocusStop').addEventListener('click', () => stopSelect.focus());
+  el('railRefresh').addEventListener('click', () => stopSelect.dispatchEvent(new Event('change')));
 
-  // Quick boot: try load cached route union instantly (if exists)
-  announceStatus(CANTO.loadingCache);
+  // in-card refresh
+  const refreshBtn = el('refreshEtaBtn');
+  if (refreshBtn) refreshBtn.addEventListener('click', () => stopSelect.dispatchEvent(new Event('change')));
 
+  // keep uppercase
+  routeInput.addEventListener('input', (e) => {
+    const v = e.target.value.toUpperCase();
+    if (v !== e.target.value) e.target.value = v;
+  });
+
+  // toggle dir (both)
+  function toggleDir(){
+    if (!routeInput.value) return;
+    currentDirection = currentDirection === 'outbound' ? 'inbound' : 'outbound';
+    updateDestination(routeInput.value.toUpperCase());
+    updateRouteAndStops();
+  }
+  el('toggleDirectionBtn').addEventListener('click', toggleDir);
+  el('railToggleDir').addEventListener('click', toggleDir);
+
+  // toggle company (both)
+  function toggleCompany(){
+    companyMode = (companyMode === 'AUTO') ? 'KMB' : (companyMode === 'KMB') ? 'CTB' : 'AUTO';
+    const route = routeInput.value.toUpperCase();
+    updateButtons(route);
+
+    if (!route) return;
+    resolvedCompany = resolveCompanyForRoute(route);
+    if (!resolvedCompany){
+      announceAlert(CANTO.routeNotFound);
+      return;
+    }
+    updateDestination(route);
+    updateRouteAndStops();
+  }
+  el('toggleCompanyBtn').addEventListener('click', toggleCompany);
+  el('railToggleCompany').addEventListener('click', toggleCompany);
+
+  // load routes/stops (cached)
   try{
-    // Parallel: load cached + network via our cacheFetch
-    setLoading(true, CANTO.loadingRoutes);
-    showVisibleStatus('而家載入緊路線資料…', 'info', '載入');
+    setLoading(true);
+    announceStatus(CANTO.updating);
 
     const [kmbStops, kmbRoutes, ctbRoutes] = await Promise.all([
       KMB.fetchStopsMap(),
@@ -798,7 +893,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     ctbRoutesSet = new Set(ctbRoutesData.map(x => String(x.route).toUpperCase()));
     ctbRouteMap = new Map(ctbRoutesData.map(x => [String(x.route).toUpperCase(), x]));
 
-    // Populate route datalist
     routesDatalist.innerHTML = '';
     const union = Array.from(new Set([...kmbRoutesSet, ...ctbRoutesSet]))
       .sort((a,b) => a.localeCompare(b, undefined, {numeric:true, sensitivity:'base'}));
@@ -808,59 +902,28 @@ document.addEventListener('DOMContentLoaded', async () => {
       routesDatalist.appendChild(o);
     });
 
-    showVisibleStatus('路線資料已載入。你可以輸入路線。', 'success', '完成');
-  }catch(err){
-    showVisibleStatus('載入路線資料失敗：' + (err.message || ''), 'error', '錯誤');
+    announceStatus(CANTO.updated);
+  }catch(e){
+    announceAlert(CANTO.etaError);
   }finally{
-    setLoading(false, '載入完成');
+    setLoading(false);
   }
 
-  // Keep uppercase input
-  routeInput.addEventListener('input', (e) => {
-    const v = e.target.value.toUpperCase();
-    if (v !== e.target.value) e.target.value = v;
-  });
-
-  // Toggle direction
-  el('toggleDirectionBtn').addEventListener('click', () => {
-    if (!routeInput.value) return;
-    currentDirection = currentDirection === 'outbound' ? 'inbound' : 'outbound';
-    updateDestination(routeInput.value);
-    updateRouteAndStops();
-  });
-
-  // Toggle company mode
-  el('toggleCompanyBtn').addEventListener('click', () => {
-    companyMode = (companyMode === 'AUTO') ? 'KMB' : (companyMode === 'KMB') ? 'CTB' : 'AUTO';
-    const route = routeInput.value.toUpperCase();
-    updateCompanyButtonLabel(route);
-    if (!route) return;
-
-    resolvedCompany = resolveCompanyForRoute(route);
-    if (!resolvedCompany) {
-      showVisibleStatus(CANTO.routeNotFound, 'error', '錯誤');
-      return;
-    }
-    showVisibleStatus(`已切換：${companyLabel(companyMode)}（目前用：${resolvedCompany}）`, 'success', '完成');
-    updateDestination(route);
-    updateRouteAndStops();
-  });
-
-  // Route change
+  // route change
   routeInput.addEventListener('change', () => {
     const route = routeInput.value.toUpperCase();
     routeInput.value = route;
 
     resolvedCompany = resolveCompanyForRoute(route);
-    updateCompanyButtonLabel(route);
+    updateButtons(route);
 
-    if (!resolvedCompany) {
+    if (!resolvedCompany){
       updateDestination('');
-      stopSelect.innerHTML = '<option value="">請先選擇路線同目的地</option>';
-      etaList.style.display = 'none';
+      stopSelect.innerHTML = '<option value="">先揀路線</option>';
+      if (etaList){ etaList.style.display='none'; etaList.innerHTML=''; }
       simpleCard.style.display = 'none';
       el('emptyState').style.display = 'block';
-      showVisibleStatus(CANTO.routeNotFound, 'error', '錯誤');
+      announceAlert(CANTO.routeNotFound);
       return;
     }
 
@@ -869,21 +932,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     updateRouteAndStops();
   });
 
-  // Update route + stops (cache helps speed)
   async function updateRouteAndStops(){
     const route = routeInput.value.toUpperCase();
     if (!route || !resolvedCompany) return;
 
-    setLoading(true, CANTO.updatingRoute);
-    showVisibleStatus('而家更新緊巴士站…', 'info', '更新');
+    setLoading(true);
+    announceStatus(CANTO.updating);
+    showVisibleStatus('更新緊…','info');
 
     el('emptyState').style.display = 'none';
-    etaList.style.display = 'none';
+    if (etaList){ etaList.style.display='none'; etaList.innerHTML=''; }
     simpleCard.style.display = 'none';
     stopSelect.innerHTML = '';
 
     try{
-      if (resolvedCompany === 'KMB') {
+      if (resolvedCompany === 'KMB'){
         const sd = await KMB.fetchRouteStops(route, currentDirection);
         sd.sort((a,b)=>Number(a.seq)-Number(b.seq)).forEach(it => {
           const opt = document.createElement('option');
@@ -892,23 +955,21 @@ document.addEventListener('DOMContentLoaded', async () => {
           opt.dataset.seq = String(it.seq);
           stopSelect.appendChild(opt);
         });
-      } else {
-        // CTB: show quickly with stopId, then fill names from cache/detail (limited concurrency)
+      }else{
         const sd = await CTB.fetchRouteStops(route, currentDirection);
+
         sd.sort((a,b)=>Number(a.seq)-Number(b.seq)).forEach(it => {
           const opt = document.createElement('option');
           opt.value = it.stop;
-          opt.textContent = `${it.seq}. ${it.stop}`; // placeholder fast
+          opt.textContent = `${it.seq}. ${it.stop}`;
           opt.dataset.seq = String(it.seq);
           stopSelect.appendChild(opt);
         });
 
-        // Fill stop names progressively (from cache, limited parallel to keep UI smooth)
         const ids = sd.map(x => x.stop);
         mapLimit(ids, 6, async (id) => {
           try{
             const det = await CTB.fetchStopDetail(id);
-            // update option text if still present
             for (const opt of stopSelect.options){
               if (opt.value === id){
                 const seq = opt.dataset.seq || '';
@@ -921,53 +982,45 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
       }
 
-      el('toggleDirectionBtn').disabled = false;
-
-      showVisibleStatus('巴士站已更新。你可以揀巴士站。', 'success', '完成');
-      setLoading(false, '巴士站已更新');
-
-      // try auto nearest
+      announceStatus(CANTO.updated);
+      showVisibleStatus('已更新','success');
       autoFindClosestStop(route);
-
-    }catch(err){
-      showVisibleStatus(err.message || '更新巴士站失敗', 'error', '錯誤');
-      setLoading(false, '更新失敗');
+    }catch(e){
+      announceAlert(CANTO.etaError);
+      showVisibleStatus('失敗','error');
+    }finally{
+      setLoading(false);
     }
   }
 
-  // Refresh button
-  el('refreshEtaBtn').addEventListener('click', () => {
-    el('stopSelect').dispatchEvent(new Event('change'));
-  });
-
-  // Stop change -> fetch ETA (never cached)
+  // stop change -> ETA (no cache)
   stopSelect.addEventListener('change', async () => {
     const route = routeInput.value.toUpperCase();
     const stopId = stopSelect.value;
 
-    if (!stopId || !route || !resolvedCompany) {
-      etaList.style.display = 'none';
-      simpleCard.style.display = 'none';
-      el('emptyState').style.display = 'block';
+    if (!stopId || !route || !resolvedCompany){
+      if (etaList) etaList.style.display='none';
+      simpleCard.style.display='none';
+      el('emptyState').style.display='block';
       return;
     }
 
-    setLoading(true, CANTO.updatingEta);
-    showVisibleStatus('而家更新緊到站時間…', 'info', '更新');
+    setLoading(true);
+    announceStatus(CANTO.updating);
+    showVisibleStatus('更新緊…','info');
 
-    el('emptyState').style.display = 'none';
-    etaList.innerHTML = '';
-    etaList.style.display = 'none';
-    simpleCard.style.display = 'none';
+    el('emptyState').style.display='none';
+    if (etaList){ etaList.innerHTML=''; etaList.style.display='none'; }
+    simpleCard.style.display='none';
 
     try{
       const selectedSeq = Number(stopSelect.options[stopSelect.selectedIndex].dataset.seq || '0');
 
       let validEtas = [];
-      if (resolvedCompany === 'KMB') {
+      if (resolvedCompany === 'KMB'){
         const ed = await KMB.fetchEta(stopId, route);
         validEtas = ed.filter(it => Number(it.seq) === selectedSeq);
-      } else {
+      }else{
         const ed = await CTB.fetchEta(stopId, route);
         const dirLetter = currentDirection === 'outbound' ? 'O' : 'I';
         validEtas = ed.filter(it => Number(it.seq) === selectedSeq && String(it.dir).toUpperCase() === dirLetter);
@@ -976,24 +1029,20 @@ document.addEventListener('DOMContentLoaded', async () => {
       const simpleMain = el('simpleMain');
       const simpleSub = el('simpleSub');
 
-      if (!validEtas || validEtas.length === 0) {
-        simpleMain.textContent = '暫時冇班次資訊';
-        simpleSub.textContent = '可以等陣再撳「立即更新」';
-        simpleCard.style.display = 'block';
-        announceStatus('暫時冇班次資訊');
-        setLoading(false, CANTO.updatedEta);
-        showVisibleStatus('到站時間已更新。', 'success', '完成');
+      if (!validEtas || validEtas.length === 0){
+        simpleMain.textContent = '暫無資料';
+        if (simpleSub) simpleSub.textContent = '';
+        simpleCard.style.display='block';
+        announceStatus('暫無資料');
         return;
       }
 
       const next = pickNextBus(validEtas);
-      if (!next) {
+      if (!next){
         simpleMain.textContent = CANTO.noService;
-        simpleSub.textContent = '可以轉另一個站，或者等陣再試';
-        simpleCard.style.display = 'block';
-        announceStatus(`${CANTO.updatedEta}。${CANTO.noService}`);
-        setLoading(false, CANTO.updatedEta);
-        showVisibleStatus('到站時間已更新。', 'success', '完成');
+        if (simpleSub) simpleSub.textContent = '';
+        simpleCard.style.display='block';
+        announceStatus(CANTO.noService);
         return;
       }
 
@@ -1001,50 +1050,54 @@ document.addEventListener('DOMContentLoaded', async () => {
       const min = Math.floor(diffSec / 60);
       const sec = diffSec % 60;
 
-      // Big simple UI
-      const bigText = (min <= 0)
-        ? `仲有 ${sec} 秒`
-        : `仲有 ${min} 分 ${sec} 秒`;
+      const bigText = (min <= 0) ? `仲有 ${sec} 秒` : `仲有 ${min} 分 ${sec} 秒`;
 
       const etaD = new Date(next.it.eta);
       const hr = etaD.getHours();
       const mm = String(etaD.getMinutes()).padStart(2,'0');
-      const rmk = next.it.rmk_tc || next.it.rmk_en || '實時班次';
+      const rmk = next.it.rmk_tc || next.it.rmk_en || '';
 
       simpleMain.textContent = bigText;
-      simpleSub.textContent = `預計 ${hr}:${mm}｜${rmk}`;
-      simpleCard.style.display = 'block';
+      if (simpleSub) simpleSub.textContent = (rmk ? `預計 ${hr}:${mm}｜${rmk}` : `預計 ${hr}:${mm}`);
+      simpleCard.style.display='block';
 
-      // Cantonese spoken summary (short)
-      const speech = `最快嗰班，${speakCountdown(min, sec)}。`;
-      announceStatus(`${CANTO.updatedEta}。${speech}`);
+      announceStatus(`${CANTO.updated}。最快：${speakCountdown(min, sec)}`);
 
-      setLoading(false, CANTO.updatedEta);
-      showVisibleStatus('到站時間已更新。', 'success', '完成');
+      // standard mode: show list (limited)
+      if (getMode() === 'std' && etaList){
+        const items = validEtas.slice(0, 6);
+        items.forEach((it) => {
+          const eta = it.eta ? new Date(it.eta) : null;
+          const nowD = new Date(it.data_timestamp || Date.now());
+          let cd = '';
+          if (eta){
+            const ds = Math.floor((eta - nowD)/1000);
+            const m = Math.floor(ds/60);
+            const s = Math.abs(ds%60);
+            if (m >= 0) cd = `${m}分${String(s).padStart(2,'0')}秒`;
+          }
+          const hr2 = eta ? eta.getHours() : '';
+          const mm2 = eta ? String(eta.getMinutes()).padStart(2,'0') : '';
+          const rmk2 = it.rmk_tc || it.rmk_en || '';
 
-      // Optional full list (only if you want)
-      if (!SIMPLE_MODE) {
-        const spoken = [];
-        validEtas.forEach((it, idx) => {
-          const block = formatEtaBlock(it.eta, it.data_timestamp, it.rmk_tc || it.rmk_en || '實時班次');
           const div = document.createElement('div');
           div.className = 'etaItem';
           div.innerHTML = `
-            <div class="etaTime">${block.isNoService ? '短時間內冇巴士' : block.timeText}</div>
-            <div class="etaCountdown">${block.countdownText || ''}</div>
-            <div class="etaRemark">${block.remarkText || ''}</div>
+            <div class="etaTime">${eta ? `${hr2}:${mm2}` : CANTO.noService}</div>
+            <div class="etaCountdown">${cd ? `距離 ${cd}` : ''}</div>
+            <div class="etaRemark">${rmk2}</div>
           `;
           etaList.appendChild(div);
-          if (block.isNoService) spoken.push('短時間內冇巴士');
-          else spoken.push(`第${idx+1}班：${block.countdownText.replace('距離抵達 ','')}`);
         });
-        etaList.style.display = 'block';
+        etaList.style.display='block';
       }
 
-    }catch(err){
-      showVisibleStatus(err.message || CANTO.etaError, 'error', '錯誤');
+      showVisibleStatus('已更新','success');
+    }catch(e){
       announceAlert(CANTO.etaError);
-      setLoading(false, CANTO.etaError);
+      showVisibleStatus('失敗','error');
+    }finally{
+      setLoading(false);
     }
   });
 });
