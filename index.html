@@ -19,7 +19,7 @@
       --shadow:0 12px 30px rgba(0,0,0,.35);
       --minTap:48px;
       --font: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";
-      --railSpace: 0px; /* ✅ reserve space for mobile dock */
+      --railSpace: 0px; /* reserve space for mobile dock */
     }
     *{ box-sizing:border-box; }
     html, body { height:100%; }
@@ -31,10 +31,11 @@
       line-height:1.55;
       -webkit-text-size-adjust: 100%;
     }
+
     .skip-link{
       position:absolute; left:-999px; top:0;
       background:#000; color:#fff;
-      padding:.75rem 1rem; border-radius:10px;
+      padding:.65rem .9rem; border-radius:10px;
       z-index:9999;
     }
     .skip-link:focus{ left:.75rem; top:.75rem; outline:3px solid var(--focus); }
@@ -42,21 +43,60 @@
     .wrap{
       max-width:560px;
       margin:0 auto;
-      padding:16px 12px calc(28px + var(--railSpace)); /* ✅ avoid being covered by dock */
+      padding:12px 12px calc(22px + var(--railSpace));
     }
+
+    /* ===== Compact Header (1 line) ===== */
     header{
-      background: linear-gradient(135deg, rgba(96,165,250,.25), rgba(59,130,246,.12));
+      background: linear-gradient(135deg, rgba(96,165,250,.20), rgba(59,130,246,.10));
       border:1px solid var(--border);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
-      padding:18px 16px;
-      margin-top:10px;
+      padding:10px 12px;          /* ✅ smaller */
+      margin-top:6px;             /* ✅ smaller */
     }
-    header h1{ margin:0; font-size:1.35rem; letter-spacing:.2px; }
-    header p{ margin:.35rem 0 0; color:var(--muted); font-size:.95rem; }
+    .headerRow{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      min-width:0;
+    }
+    header h1{
+      margin:0;
+      font-size:1.08rem;          /* ✅ smaller */
+      letter-spacing:.1px;
+      line-height:1.2;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      min-width:0;
+      font-weight:1200;
+    }
+    .headerSub{
+      color:var(--muted2);
+      font-weight:900;
+      font-size:.82rem;           /* ✅ small sub text */
+      margin-left:6px;
+    }
+    .modeBadge{
+      flex:0 0 auto;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:6px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,.25);
+      background: rgba(18,32,68,.55);
+      color:var(--muted);
+      font-weight:1100;
+      font-size:.85rem;           /* ✅ small */
+      white-space:nowrap;
+    }
 
     main{
-      margin-top:14px;
+      margin-top:10px;            /* ✅ smaller than before */
       background:rgba(15,26,51,.72);
       border:1px solid var(--border);
       border-radius: var(--radius);
@@ -64,6 +104,7 @@
       padding:14px;
       position:relative;
     }
+
     .group{ margin-bottom:14px; }
     label{ display:block; font-weight:1100; margin-bottom:8px; }
     input, select, button{ font: inherit; }
@@ -96,10 +137,9 @@
     }
 
     .row{ display:flex; gap:10px; flex-wrap:wrap; }
-    /* ✅ Fix: prevent flex overflow on small screens */
     .row > *{
       flex: 1 1 160px;
-      min-width: 0;
+      min-width: 0; /* ✅ prevent flex overflow */
     }
 
     .btn{
@@ -209,13 +249,12 @@
     /* ===== Mode rules ===== */
     body.mode-sr .standard-only{ display:none !important; }
     body.mode-std .sr-only-ui{ display:none !important; }
-    body.mode-sr header p{ display:none; }
 
     /* ===== Right-side control rail (desktop/tablet) ===== */
     .rail{
       position:fixed;
       right: max(10px, env(safe-area-inset-right));
-      top: 110px;
+      top: 98px;
       z-index: 999;
       display:flex;
       flex-direction:column;
@@ -310,7 +349,6 @@
       border-bottom:1px solid var(--border);
       gap:10px;
     }
-    /* ✅ Fix: title never breaks */
     .modalTitle{
       flex: 1 1 auto;
       min-width: 0;
@@ -331,7 +369,6 @@
       border-radius:10px;
       border:1px solid rgba(148,163,184,.25);
     }
-    /* ✅ Fix: Chinese padding/line-height */
     .modalBody{
       padding:14px;
       overflow:auto;
@@ -368,12 +405,18 @@
     }
   </style>
 </head>
+
 <body class="mode-sr">
   <a class="skip-link" href="#main">跳到主要內容</a>
+
   <div class="wrap">
     <header role="banner" aria-label="標題">
-      <h1>🚌 巴士到達（KMB / CTB）</h1>
-      <p class="standard-only">螢幕閱讀／標準</p>
+      <div class="headerRow">
+        <h1 aria-label="巴士到達">
+          🚌 巴士到達 <span class="headerSub">(KMB/CTB)</span>
+        </h1>
+        <div id="modeBadge" class="modeBadge" aria-label="目前模式">螢幕閱讀</div>
+      </div>
     </header>
 
     <!-- Live regions -->
@@ -518,15 +561,20 @@
       localStorage.setItem(MODE_KEY, mode);
       document.body.classList.toggle('mode-sr', mode === 'sr');
       document.body.classList.toggle('mode-std', mode === 'std');
+
       const rail = el('modeToggleRail');
       const top = el('modeToggleTop');
+      const badge = el('modeBadge');
+
       if (mode === 'sr'){
         rail.textContent = '螢幕閱讀';
         if (top) top.textContent = '模式：螢幕閱讀';
+        if (badge) badge.textContent = '螢幕閱讀';
         announceStatus('螢幕閱讀');
       }else{
         rail.textContent = '標準';
         if (top) top.textContent = '模式：標準';
+        if (badge) badge.textContent = '標準';
         announceStatus('標準');
       }
     }
@@ -874,9 +922,6 @@
     }
 
     /* ===== Render ===== */
-    // Render the 2 lines in card:
-    // - SR mode: show max 2 lines (最快 + 下一班)
-    // - STD mode: still show these 2 lines, written style (no clock time to save space)
     function renderCardTwoLines(sorted){
       const grid = el('etaGrid');
       grid.innerHTML = '';
@@ -906,7 +951,6 @@
         grid.appendChild(div);
       });
 
-      // spoken summary (keep short)
       if (mode === 'sr'){
         const s1 = items[0] ? cdSpoken(parseEtaSeconds(items[0].eta, items[0].data_timestamp)) : SAY.none;
         const s2 = items[1] ? cdSpoken(parseEtaSeconds(items[1].eta, items[1].data_timestamp)) : '';
@@ -914,9 +958,6 @@
       }
     }
 
-    // Standard extra buses: one compact row (Option A)
-    // - NO clock time
-    // - different scale: minutes only
     function renderExtraRowStandard(sorted){
       const row = el('extraRow');
       row.innerHTML = '';
@@ -935,13 +976,12 @@
         if (!cd) return;
         const span = document.createElement('span');
         span.className = 'extraItem';
-        span.textContent = `⏱ ${cd}`; // compact
+        span.textContent = `⏱ ${cd}`;
         row.appendChild(span);
       });
       row.style.display = row.childElementCount ? 'flex' : 'none';
     }
 
-    // Details modal shows ALL (clock + countdown + remark)
     function openDetails(){
       const bd = el('modalBody');
       bd.innerHTML = '';
@@ -974,7 +1014,6 @@
       el('modalBackdrop').setAttribute('aria-hidden','true');
     }
 
-    /* ===== Auto nearest stop ===== */
     async function autoFindClosestStop(route){
       const stopSelect = el('stopSelect');
       if (!route || !resolvedCompany) return;
@@ -1022,15 +1061,12 @@
 
     /* ===== Start ===== */
     document.addEventListener('DOMContentLoaded', async () => {
-      // mode init
       setMode(getMode());
 
-      // mode toggles
       el('modeToggleRail').addEventListener('click', toggleMode);
       const top = el('modeToggleTop');
       if (top) top.addEventListener('click', toggleMode);
 
-      // modal
       el('detailsBtn').addEventListener('click', openDetails);
       el('closeModalBtn').addEventListener('click', closeDetails);
       el('modalBackdrop').addEventListener('click', (e) => {
@@ -1041,19 +1077,16 @@
       const stopSelect = el('stopSelect');
       const routesDatalist = el('routes');
 
-      // rail actions
       el('railFocusRoute').addEventListener('click', () => routeInput.focus());
       el('railFocusStop').addEventListener('click', () => stopSelect.focus());
       el('railRefresh').addEventListener('click', () => stopSelect.dispatchEvent(new Event('change')));
       el('refreshBtn').addEventListener('click', () => stopSelect.dispatchEvent(new Event('change')));
 
-      // keep uppercase
       routeInput.addEventListener('input', (e) => {
         const v = e.target.value.toUpperCase();
         if (v !== e.target.value) e.target.value = v;
       });
 
-      // toggle direction
       function toggleDir(){
         if (!routeInput.value) return;
         currentDirection = currentDirection === 'outbound' ? 'inbound' : 'outbound';
@@ -1063,7 +1096,6 @@
       el('toggleDirectionBtn').addEventListener('click', toggleDir);
       el('railToggleDir').addEventListener('click', toggleDir);
 
-      // toggle company
       function toggleCompany(){
         companyMode = (companyMode === 'AUTO') ? 'KMB' : (companyMode === 'KMB') ? 'CTB' : 'AUTO';
         const route = routeInput.value.toUpperCase();
@@ -1080,7 +1112,6 @@
       el('toggleCompanyBtn').addEventListener('click', toggleCompany);
       el('railToggleCompany').addEventListener('click', toggleCompany);
 
-      // load base data (cached)
       try{
         setLoading(true);
         announceStatus(SAY.updating);
@@ -1116,7 +1147,6 @@
         setLoading(false);
       }
 
-      // route change
       routeInput.addEventListener('change', () => {
         const route = routeInput.value.toUpperCase();
         routeInput.value = route;
@@ -1160,7 +1190,6 @@
             });
           }else{
             const sd = await CTB.fetchRouteStops(route, currentDirection);
-            // fast placeholders
             sd.sort((a,b)=>Number(a.seq)-Number(b.seq)).forEach(it => {
               const opt = document.createElement('option');
               opt.value = it.stop;
@@ -1168,7 +1197,7 @@
               opt.dataset.seq = String(it.seq);
               stopSelect.appendChild(opt);
             });
-            // fill names progressively
+
             const ids = sd.map(x => x.stop);
             mapLimit(ids, 6, async (id) => {
               try{
@@ -1194,7 +1223,6 @@
         }
       }
 
-      // stop change -> ETA (no cache)
       stopSelect.addEventListener('change', async () => {
         const route = routeInput.value.toUpperCase();
         const stopId = stopSelect.value;
@@ -1226,8 +1254,8 @@
           lastEtasSorted = sorted;
 
           el('etaCard').style.display = 'block';
-          renderCardTwoLines(sorted);        // SR: 2 buses only; STD: 2 lines
-          renderExtraRowStandard(sorted);    // STD: compact extra row
+          renderCardTwoLines(sorted);
+          renderExtraRowStandard(sorted);
 
           announceStatus(SAY.updated);
         }catch(_){
@@ -1240,3 +1268,4 @@
   </script>
 </body>
 </html>
+``
