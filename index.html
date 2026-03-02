@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>巴士到達 - KMB / CTB（螢幕閱讀 / 標準）</title>
+  <title>巴士到達（KMB / CTB）</title>
 
   <style>
     :root{
@@ -14,10 +14,6 @@
       --muted:#cbd5e1;
       --muted2:#94a3b8;
       --primary:#60a5fa;
-      --primary2:#3b82f6;
-      --ok:#34d399;
-      --warn:#fbbf24;
-      --bad:#fb7185;
       --border:rgba(148,163,184,.25);
       --focus:#fbbf24;
       --radius:16px;
@@ -73,7 +69,7 @@
     }
 
     .group{ margin-bottom:14px; }
-    label{ display:block; font-weight:1000; margin-bottom:8px; }
+    label{ display:block; font-weight:1100; margin-bottom:8px; }
 
     input, select, button{ font: inherit; }
 
@@ -87,7 +83,6 @@
       color:var(--text);
       outline:none;
     }
-
     .select{
       appearance:none;
       background-image:
@@ -100,13 +95,10 @@
       background-repeat:no-repeat;
       padding-right:44px;
     }
-
     .input:focus, .select:focus, button:focus{
       outline:3px solid var(--focus);
       outline-offset:2px;
     }
-
-    .hint{ margin-top:6px; color:var(--muted2); font-size:.9rem; }
 
     .row{ display:flex; gap:10px; flex-wrap:wrap; }
     .row > *{ flex:1; min-width: 160px; }
@@ -118,7 +110,7 @@
       padding:10px 12px;
       background: rgba(18,32,68,.75);
       color:var(--text);
-      font-weight:1000;
+      font-weight:1100;
       cursor:pointer;
       display:inline-flex;
       align-items:center;
@@ -145,20 +137,7 @@
       background: rgba(15,26,51,.75);
     }
 
-    .dest{ font-size:1rem; font-weight:1000; color: var(--primary); }
-
-    .statusBox{
-      margin:10px 0 0;
-      padding:12px;
-      border-radius: 14px;
-      border:1px solid var(--border);
-      background: rgba(15,26,51,.75);
-    }
-    .statusBox.success{ border-color: rgba(52,211,153,.5); }
-    .statusBox.error{ border-color: rgba(251,113,133,.5); }
-    .statusBox.info{ border-color: rgba(96,165,250,.5); }
-    .statusTitle{ font-weight:1000; margin:0 0 4px; }
-    .statusText{ margin:0; color:var(--muted); }
+    .dest{ font-size:1rem; font-weight:1100; color: var(--primary); }
 
     .loading{
       display:none;
@@ -169,19 +148,63 @@
       background: rgba(15,26,51,.75);
     }
     .loading.show{ display:block; }
+    .loading small{ color:var(--muted2); }
 
-    .etaList{ margin-top:12px; display:none; }
-    .etaItem{
-      display:flex; flex-direction:column; gap:4px;
-      padding:12px; border-radius:14px;
-      border:1px solid var(--border);
-      background: rgba(18,32,68,.55);
-      margin-bottom:10px;
+    /* ===== Next buses card ===== */
+    #etaCard{ display:none; }
+    .etaTitle{ font-weight:1200; font-size:1.05rem; margin-bottom:8px; }
+
+    .etaGrid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:10px;
     }
-    .etaTime{ font-size:1.2rem; font-weight:1000; color: var(--primary); }
-    .etaCountdown{ color: var(--muted); font-weight:1000; }
-    .etaRemark{ color: var(--muted2); font-size:.92rem; }
 
+    .etaLine{
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:10px;
+      background: rgba(18,32,68,.55);
+    }
+
+    .etaLineTop{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap:10px;
+      margin-bottom:4px;
+    }
+
+    .etaLabel{
+      font-weight:1100;
+      color:var(--muted2);
+      font-size:.9rem;
+    }
+
+    .etaBig{
+      font-size:2.0rem;
+      font-weight:1300;
+      color:var(--primary);
+      line-height:1.08;
+    }
+
+    /* ===== Standard: extra buses compact row (Option A) ===== */
+    .extraRow{
+      margin-top:10px;
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:8px 10px;
+      background: rgba(18,32,68,.40);
+      color:var(--muted);
+      font-size:.92rem;
+      line-height:1.25;
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+    }
+    .extraItem{ white-space:nowrap; }
+
+    /* ===== Live regions ===== */
     .sr-only{
       position:absolute !important;
       width:1px; height:1px;
@@ -193,20 +216,7 @@
     /* ===== Mode rules ===== */
     body.mode-sr .standard-only{ display:none !important; }
     body.mode-std .sr-only-ui{ display:none !important; }
-
-    /* SR mode: visually quiet */
     body.mode-sr header p{ display:none; }
-    body.mode-sr .hint{ display:none !important; }
-    body.mode-sr .statusBox{ display:none !important; }
-
-    /* Simple card */
-    #simpleCard{ display:none; }
-    #simpleMain{
-      font-size:2.0rem;
-      font-weight:1100;
-      color:var(--primary);
-      letter-spacing:.2px;
-    }
 
     /* ===== Right-side control rail ===== */
     .rail{
@@ -227,11 +237,10 @@
     .railTitle{
       font-size:.9rem;
       color:var(--muted2);
-      font-weight:1000;
+      font-weight:1100;
       text-align:center;
       margin-bottom:4px;
     }
-
     @media (max-width: 640px){
       .rail{
         right: max(8px, env(safe-area-inset-right));
@@ -242,8 +251,92 @@
       .rail .btn{ width:140px; }
     }
 
-    @media (prefers-reduced-motion: reduce){
-      *{ scroll-behavior:auto !important; transition:none !important; animation:none !important; }
+    /* ===== Details modal ===== */
+    .modalBackdrop{
+      position:fixed; inset:0;
+      background:rgba(0,0,0,.55);
+      display:none;
+      z-index:2000;
+      padding: max(10px, env(safe-area-inset-top)) 10px max(10px, env(safe-area-inset-bottom)) 10px;
+    }
+    .modal{
+      max-width:560px;
+      margin:0 auto;
+      background:rgba(15,26,51,.95);
+      border:1px solid var(--border);
+      border-radius:16px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+      max-height: 92vh;
+    }
+    .modalHeader{
+      padding:12px 14px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      border-bottom:1px solid var(--border);
+      gap:10px;
+    }
+
+    /* ✅ Fix: title never breaks */
+    .modalTitle{
+      flex: 1 1 auto;
+      min-width: 0;
+      font-weight:1200;
+      white-space:nowrap;
+      word-break:keep-all;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      line-height:1.25;
+    }
+
+    .modalClose{
+      border:none;
+      background:transparent;
+      color:var(--text);
+      font-size:1.2rem;
+      cursor:pointer;
+      padding:8px 10px;
+      border-radius:10px;
+      border:1px solid rgba(148,163,184,.25);
+    }
+
+    /* ✅ Fix: Chinese padding/line-height */
+    .modalBody{
+      padding:14px;
+      overflow:auto;
+    }
+    .modalItem{
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:12px 14px;
+      background: rgba(18,32,68,.55);
+      margin-bottom:10px;
+    }
+    .modalRow{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:center;
+      line-height:1.4;
+    }
+    .modalTime{
+      font-weight:1200;
+      color:var(--primary);
+      white-space:nowrap;
+    }
+    .modalCd{
+      font-weight:1100;
+      white-space:nowrap;
+    }
+    .modalRm{
+      margin-top:6px;
+      color:var(--muted2);
+      font-size:.9rem;
+      line-height:1.6;
+      word-break:break-word;
     }
   </style>
 </head>
@@ -262,31 +355,22 @@
     <div id="srAlert" class="sr-only" role="alert" aria-atomic="true"></div>
 
     <main id="main" role="main" aria-label="巴士到站查詢">
-      <!-- Mode toggle (standard mode only, minimal text) -->
       <section class="group standard-only" aria-label="模式">
         <button id="modeToggleTop" class="btn warn" aria-label="切換模式">模式：螢幕閱讀</button>
       </section>
 
       <section class="group" aria-label="路線">
         <label for="routeInput">路線</label>
-        <input
-          id="routeInput"
-          class="input"
-          list="routes"
-          inputmode="text"
-          autocomplete="off"
-          placeholder="例如：1A / 101 / A21"
-          aria-label="輸入路線"
-        />
+        <input id="routeInput" class="input" list="routes" inputmode="text" autocomplete="off"
+          placeholder="例如：1A / 101 / A21" aria-label="輸入路線" />
         <datalist id="routes"></datalist>
       </section>
 
       <section class="group" aria-label="目的地">
-        <div class="card" id="destinationCard">
+        <div class="card">
           <div class="dest" id="destinationText">請輸入路線</div>
         </div>
 
-        <!-- In-content buttons (standard mode only) -->
         <div class="row standard-only" style="margin-top:10px;">
           <button id="toggleDirectionBtn" class="btn" disabled aria-label="切換方向">🔁 方向</button>
           <button id="toggleCompanyBtn" class="btn" disabled aria-label="切換公司">🏢 公司</button>
@@ -300,28 +384,24 @@
         </select>
       </section>
 
-      <!-- Visible status box only in standard mode -->
-      <div id="statusBox" class="statusBox info standard-only" style="display:none;" aria-label="狀態">
-        <p class="statusTitle" id="statusTitle">狀態</p>
-        <p class="statusText" id="statusText"></p>
-      </div>
-
       <div id="loadingBox" class="loading" aria-label="載入中" aria-busy="false">
         <strong>載入中…</strong>
+        <div class="standard-only"><small>（資料更新中）</small></div>
       </div>
 
-      <!-- Next bus card (shown in both modes) -->
-      <section id="simpleCard" class="card" aria-label="最快一班" style="display:none;">
-        <div style="font-weight:1100; font-size:1.05rem; margin-bottom:6px;">最快一班</div>
-        <div id="simpleMain">—</div>
-        <div id="simpleSub" class="hint standard-only" style="margin-top:6px;">—</div>
-        <div class="row standard-only" style="margin-top:12px;">
-          <button id="refreshEtaBtn" class="btn primary" aria-label="更新">🔄 更新</button>
+      <!-- Main ETA card -->
+      <section id="etaCard" class="card" aria-label="到站時間">
+        <div class="etaTitle">到站時間</div>
+        <div class="etaGrid" id="etaGrid"></div>
+
+        <!-- Standard extra row -->
+        <div id="extraRow" class="extraRow standard-only" style="display:none;"></div>
+
+        <div class="row" style="margin-top:12px;">
+          <button id="refreshBtn" class="btn primary" aria-label="更新">🔄 更新</button>
+          <button id="detailsBtn" class="btn" aria-label="詳情">📄 詳情</button>
         </div>
       </section>
-
-      <!-- Full list (standard mode only) -->
-      <section class="etaList standard-only" id="etaList" aria-label="完整到站時間" aria-live="off"></section>
 
       <section id="emptyState" class="card" aria-label="提示">
         <strong>輸入路線，再揀站。</strong>
@@ -334,26 +414,30 @@
     <div class="railTitle">操作</div>
 
     <button id="modeToggleRail" class="btn warn" aria-label="切換模式">螢幕閱讀</button>
-
     <button id="railRefresh" class="btn primary" aria-label="更新">🔄 更新</button>
-
     <button id="railFocusStop" class="btn" aria-label="去揀站">📍 揀站</button>
-
     <button id="railFocusRoute" class="btn" aria-label="去輸入路線">🚌 路線</button>
-
     <button id="railToggleDir" class="btn" aria-label="切換方向" disabled>🔁 方向</button>
-
     <button id="railToggleCompany" class="btn" aria-label="切換公司" disabled>🏢 公司</button>
   </nav>
 
+  <!-- Details modal -->
+  <div id="modalBackdrop" class="modalBackdrop" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-label="到站詳情">
+      <div class="modalHeader">
+        <div class="modalTitle">到站詳情</div>
+        <button id="closeModalBtn" class="modalClose" aria-label="關閉">✕</button>
+      </div>
+      <div class="modalBody" id="modalBody"></div>
+    </div>
+  </div>
+
 <script>
 /* =========================
-   Fast boot + local cache (TTL + SWR)
-   - Cache: routes / stops / route-stops / stop detail
-   - NEVER cache ETA
+   Cache + mode + API
 ========================= */
 
-const APP_NS = 'buseta_a11y_v8';
+const APP_NS = 'buseta_final_full_v1';
 const NOW = () => Date.now();
 
 const TTL = {
@@ -373,13 +457,14 @@ const REVALIDATE_AFTER = {
   STOP_DETAIL: 24 * 60 * 60 * 1000
 };
 
-const CANTO = {
+// spoken (SR) announcements: short
+const SAY = {
   updating: '更新緊',
   updated: '已更新',
-  noService: '冇班次',
+  none: '冇班次',
   routeNotFound: '搵唔到路線',
-  locationDenied: '定位用唔到',
-  etaError: '更新失敗'
+  locNo: '定位用唔到',
+  fail: '更新失敗'
 };
 
 const el = (id) => document.getElementById(id);
@@ -395,17 +480,6 @@ function announceAlert(msg){
   node.textContent = '';
   setTimeout(() => node.textContent = msg, 20);
 }
-
-function showVisibleStatus(message, type='info', title='狀態'){
-  const box = el('statusBox');
-  if (!box) return;
-  el('statusTitle').textContent = title;
-  el('statusText').textContent = message;
-  box.className = 'statusBox ' + type + ' standard-only';
-  box.style.display = 'block';
-  setTimeout(() => { box.style.display = 'none'; }, 3000);
-}
-
 function setLoading(show){
   const box = el('loadingBox');
   box.className = show ? 'loading show' : 'loading';
@@ -423,38 +497,33 @@ function setMode(mode){
   document.body.classList.toggle('mode-sr', mode === 'sr');
   document.body.classList.toggle('mode-std', mode === 'std');
 
-  // minimal labels
   const rail = el('modeToggleRail');
   const top = el('modeToggleTop');
+
   if (mode === 'sr'){
     rail.textContent = '螢幕閱讀';
     if (top) top.textContent = '模式：螢幕閱讀';
-    announceStatus('螢幕閱讀模式');
+    announceStatus('螢幕閱讀');
   }else{
     rail.textContent = '標準';
     if (top) top.textContent = '模式：標準';
-    announceStatus('標準模式');
+    announceStatus('標準');
   }
 }
-function toggleMode(){
-  setMode(getMode() === 'sr' ? 'std' : 'sr');
-}
+function toggleMode(){ setMode(getMode() === 'sr' ? 'std' : 'sr'); }
 
-/* ===== Storage helpers (localStorage TTL) ===== */
+/* ===== Storage (TTL localStorage) ===== */
 const memStore = new Map();
-
 function storageAvailable(){
   try{
     const k='__t__';
     localStorage.setItem(k,'1');
     localStorage.removeItem(k);
     return true;
-  }catch(e){
-    return false;
-  }
+  }catch(e){ return false; }
 }
 const HAS_LS = storageAvailable();
-function k(key){ return `${APP_NS}:${key}`; }
+function keyName(key){ return `${APP_NS}:${key}`; }
 
 function safeSetItem(key, value){
   try{
@@ -465,9 +534,7 @@ function safeSetItem(key, value){
       Object.keys(localStorage).forEach(kk => { if (kk.startsWith(APP_NS + ':')) localStorage.removeItem(kk); });
       localStorage.setItem(key, value);
       return true;
-    }catch(e2){
-      return false;
-    }
+    }catch(_){ return false; }
   }
 }
 
@@ -475,12 +542,12 @@ function cacheSet(key, data, ttlMs){
   const now = NOW();
   const item = { ver:APP_NS, ts:now, exp:now+ttlMs, data };
   const str = JSON.stringify(item);
-  if (HAS_LS) safeSetItem(k(key), str);
-  else memStore.set(k(key), str);
+  if (HAS_LS) safeSetItem(keyName(key), str);
+  else memStore.set(keyName(key), str);
 }
 
 function cacheGet(key){
-  const raw = HAS_LS ? localStorage.getItem(k(key)) : memStore.get(k(key));
+  const raw = HAS_LS ? localStorage.getItem(keyName(key)) : memStore.get(keyName(key));
   if (!raw) return { hit:false };
   try{
     const item = JSON.parse(raw);
@@ -498,7 +565,6 @@ async function fetchJSON(url, init){
   return r.json();
 }
 
-// stale-while-revalidate
 async function cacheFetchJSON(key, url, ttlMs, revalidateAfterMs, init){
   const c = cacheGet(key);
 
@@ -530,7 +596,6 @@ async function cacheFetchJSON(key, url, ttlMs, revalidateAfterMs, init){
   return fresh;
 }
 
-// small concurrency limiter
 async function mapLimit(arr, limit, worker){
   const ret = [];
   let i = 0;
@@ -556,41 +621,65 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
   return R * c;
 }
 
-function speakCountdown(min, sec){
-  if (min <= 0 && sec > 0) return `仲有${sec}秒到`;
-  if (min > 0 && sec > 0) return `仲有${min}分${sec}秒到`;
-  if (min > 0) return `仲有${min}分鐘到`;
-  return '就到';
-}
-
-function pickNextBus(validEtas){
-  let best = null;
-  let bestSec = Infinity;
-  for (const it of validEtas){
-    if (!it.eta) continue;
-    const etaD = new Date(it.eta);
-    const nowD = new Date(it.data_timestamp || Date.now());
-    const diffSec = Math.floor((etaD - nowD) / 1000);
-    if (diffSec >= 0 && diffSec < bestSec){
-      bestSec = diffSec;
-      best = { it, diffSec };
-    }
-  }
-  return best;
-}
-
 function getCurrentLocation() {
   return new Promise((resolve, reject) => {
-    if (!navigator.geolocation) {
-      reject(new Error('定位不可用'));
-      return;
-    }
+    if (!navigator.geolocation) return reject(new Error(SAY.locNo));
     navigator.geolocation.getCurrentPosition(
       (pos) => resolve({ latitude: pos.coords.latitude, longitude: pos.coords.longitude }),
-      (_) => reject(new Error(CANTO.locationDenied)),
+      (_) => reject(new Error(SAY.locNo)),
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000 }
     );
   });
+}
+
+function parseEtaSeconds(etaIso, dataTsIso){
+  if (!etaIso) return null;
+  const etaD = new Date(etaIso);
+  const nowD = new Date(dataTsIso || Date.now());
+  return Math.floor((etaD - nowD) / 1000);
+}
+
+function formatClock(etaIso){
+  if (!etaIso) return '';
+  const d = new Date(etaIso);
+  const hh = String(d.getHours()).padStart(2,'0');
+  const mm = String(d.getMinutes()).padStart(2,'0');
+  return `${hh}:${mm}`;
+}
+
+function sortEtas(arr){
+  return arr.slice().sort((a,b)=>{
+    const ta = a.eta ? new Date(a.eta).getTime() : Infinity;
+    const tb = b.eta ? new Date(b.eta).getTime() : Infinity;
+    return ta - tb;
+  });
+}
+
+// Standard compact formatting (written Chinese)
+function cdWritten(sec){
+  if (sec == null || sec < 0) return '';
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  if (m <= 0) return `${s}秒`;
+  return `${m}分${s ? (String(s).padStart(2,'0')+'秒') : ''}`;
+}
+
+// SR spoken formatting (Cantonese)
+function cdSpoken(sec){
+  if (sec == null || sec < 0) return SAY.none;
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  if (m <= 0) return `仲有${s}秒到`;
+  if (s) return `仲有${m}分${s}秒到`;
+  return `仲有${m}分鐘到`;
+}
+
+// Extra buses in standard: different scale (minutes only to save space)
+function cdExtraCompact(sec){
+  if (sec == null || sec < 0) return '';
+  if (sec < 60) return `${sec}秒`;
+  const m = Math.floor(sec / 60);
+  return `${m}分`;
 }
 
 /* ===== Providers ===== */
@@ -695,9 +784,12 @@ let ctbRoutesData = [];
 let kmbRoutesSet = new Set();
 let ctbRoutesSet = new Set();
 let ctbRouteMap = new Map();
+
 let currentDirection = 'outbound';
 let companyMode = 'AUTO';
 let resolvedCompany = null;
+
+let lastEtasSorted = []; // for modal details
 
 function companyLabel(mode){
   if (mode === 'AUTO') return '自動';
@@ -707,24 +799,22 @@ function companyLabel(mode){
 }
 
 function resolveCompanyForRoute(route){
-  const inKMB = kmbRoutesSet.has(route);
-  const inCTB = ctbRoutesSet.has(route);
-  if (!inKMB && !inCTB) return null;
-  if (companyMode === 'KMB' && inKMB) return 'KMB';
-  if (companyMode === 'CTB' && inCTB) return 'CTB';
-  if (inKMB && !inCTB) return 'KMB';
-  if (inCTB && !inKMB) return 'CTB';
+  const inK = kmbRoutesSet.has(route);
+  const inC = ctbRoutesSet.has(route);
+  if (!inK && !inC) return null;
+  if (companyMode === 'KMB' && inK) return 'KMB';
+  if (companyMode === 'CTB' && inC) return 'CTB';
+  if (inK && !inC) return 'KMB';
+  if (inC && !inK) return 'CTB';
   if (companyMode === 'CTB') return 'CTB';
   return 'KMB';
 }
 
-function updateButtons(route){
+function updateCompanyButtons(route){
   const inBtn = el('toggleCompanyBtn');
   const railBtn = el('railToggleCompany');
-  const text = `🏢 ${companyLabel(companyMode)}`;
   inBtn.textContent = `🏢 公司：${companyLabel(companyMode)}`;
-  railBtn.textContent = text;
-
+  railBtn.textContent = `🏢 ${companyLabel(companyMode)}`;
   const disabled = !route;
   inBtn.disabled = disabled;
   railBtn.disabled = disabled;
@@ -745,9 +835,10 @@ function updateDestination(route){
 
   if (resolvedCompany === 'KMB'){
     const rows = kmbRoutesData.filter(i => String(i.route).toUpperCase() === route);
-    const currentInfo = rows.find(i => i.bound === (currentDirection === 'outbound' ? 'O' : 'I')) || rows[0];
-    if (currentInfo){
-      dest.textContent = `🎯 ${currentInfo.dest_tc}`;
+    const bound = (currentDirection === 'outbound') ? 'O' : 'I';
+    const info = rows.find(r => r.bound === bound) || rows[0];
+    if (info){
+      dest.textContent = `🎯 ${info.dest_tc}`;
       updateDirectionButtons(true);
     }else{
       dest.textContent = '請輸入路線';
@@ -772,31 +863,145 @@ function updateDestination(route){
   }
 }
 
-// auto nearest stop
+/* ===== Render ===== */
+
+// Render the 2 lines in card:
+// - SR mode: show max 2 lines (最快 + 下一班)
+// - STD mode: still show these 2 lines, written style (no clock time to save space)
+function renderCardTwoLines(sorted){
+  const grid = el('etaGrid');
+  grid.innerHTML = '';
+
+  const mode = getMode();
+  const limit = 2;
+  const items = sorted.slice(0, limit);
+
+  if (!items.length){
+    grid.innerHTML = `<div class="etaLine"><div class="etaLabel">最快</div><div class="etaBig">${SAY.none}</div></div>`;
+    return;
+  }
+
+  items.forEach((it, idx)=>{
+    const sec = parseEtaSeconds(it.eta, it.data_timestamp);
+    const label = (idx === 0) ? '最快' : '下一班';
+    const big = (mode === 'sr') ? cdSpoken(sec) : (`⏱ ${cdWritten(sec) || ''}`.trim() || SAY.none);
+
+    const div = document.createElement('div');
+    div.className = 'etaLine';
+    div.innerHTML = `
+      <div class="etaLineTop">
+        <div class="etaLabel">${label}</div>
+        <div></div>
+      </div>
+      <div class="etaBig">${big}</div>
+    `;
+    grid.appendChild(div);
+  });
+
+  // spoken summary (keep short)
+  if (mode === 'sr'){
+    const s1 = items[0] ? cdSpoken(parseEtaSeconds(items[0].eta, items[0].data_timestamp)) : SAY.none;
+    const s2 = items[1] ? cdSpoken(parseEtaSeconds(items[1].eta, items[1].data_timestamp)) : '';
+    announceStatus(`${SAY.updated}。${s1}${s2 ? '。下一班，' + s2 : ''}`);
+  }
+}
+
+// Standard extra buses: one compact row (Option A)
+// - NO clock time
+// - different scale: minutes only
+function renderExtraRowStandard(sorted){
+  const row = el('extraRow');
+  row.innerHTML = '';
+
+  if (getMode() !== 'std'){
+    row.style.display = 'none';
+    return;
+  }
+
+  const extra = sorted.slice(2);
+  if (!extra.length){
+    row.style.display = 'none';
+    return;
+  }
+
+  extra.forEach(it=>{
+    const sec = parseEtaSeconds(it.eta, it.data_timestamp);
+    const cd = cdExtraCompact(sec);
+    if (!cd) return;
+    const span = document.createElement('span');
+    span.className = 'extraItem';
+    span.textContent = `⏱ ${cd}`; // compact
+    row.appendChild(span);
+  });
+
+  row.style.display = row.childElementCount ? 'flex' : 'none';
+}
+
+// Details modal shows ALL (clock + countdown + remark)
+function openDetails(){
+  const bd = el('modalBody');
+  bd.innerHTML = '';
+
+  const list = lastEtasSorted || [];
+  if (!list.length){
+    bd.innerHTML = `<div style="color:var(--muted2);">暫無資料</div>`;
+  }else{
+    list.forEach((it, idx)=>{
+      const sec = parseEtaSeconds(it.eta, it.data_timestamp);
+      const clock = formatClock(it.eta) || SAY.none;
+      const cd = cdWritten(sec);
+      const rm = it.rmk_tc || it.rmk_en || '';
+
+      const div = document.createElement('div');
+      div.className = 'modalItem';
+      div.innerHTML = `
+        <div class="modalRow">
+          <div class="modalTime">${idx+1}. ${clock}</div>
+          <div class="modalCd">${cd ? `⏱ ${cd}` : ''}</div>
+        </div>
+        <div class="modalRm">${rm}</div>
+      `;
+      bd.appendChild(div);
+    });
+  }
+
+  el('modalBackdrop').style.display = 'block';
+  el('modalBackdrop').setAttribute('aria-hidden','false');
+}
+function closeDetails(){
+  el('modalBackdrop').style.display = 'none';
+  el('modalBackdrop').setAttribute('aria-hidden','true');
+}
+
+/* ===== Auto nearest stop ===== */
 async function autoFindClosestStop(route){
   const stopSelect = el('stopSelect');
   if (!route || !resolvedCompany) return;
   if (!stopSelect.options || stopSelect.options.length <= 1) return;
 
   try{
-    announceStatus(CANTO.updating);
     const userLocation = await getCurrentLocation();
 
-    let stopsWithCoords = [];
+    let stops = [];
     if (resolvedCompany === 'KMB'){
-      const routeStops = await KMB.fetchRouteStops(route, currentDirection);
-      const ps = routeStops.map(st => KMB.fetchStopDetail(st.stop).then(d => ({...st, ...d})));
-      stopsWithCoords = await Promise.all(ps);
+      const rs = await KMB.fetchRouteStops(route, currentDirection);
+      const details = await mapLimit(rs, 8, async (st) => {
+        const d = await KMB.fetchStopDetail(st.stop);
+        return {...st, ...d};
+      });
+      stops = details;
     }else{
-      const routeStops = await CTB.fetchRouteStops(route, currentDirection);
-      const ps = routeStops.map(st => CTB.fetchStopDetail(st.stop).then(d => ({...st, ...d})));
-      stopsWithCoords = await Promise.all(ps);
+      const rs = await CTB.fetchRouteStops(route, currentDirection);
+      const details = await mapLimit(rs, 8, async (st) => {
+        const d = await CTB.fetchStopDetail(st.stop);
+        return {...st, ...d};
+      });
+      stops = details;
     }
 
     let closestStop = null;
     let minDistance = Infinity;
-
-    stopsWithCoords.forEach(stop => {
+    stops.forEach(stop => {
       if (Number.isFinite(stop.lat) && Number.isFinite(stop.long)){
         const distance = calculateDistance(userLocation.latitude, userLocation.longitude, stop.lat, stop.long);
         if (distance < minDistance){
@@ -817,28 +1022,30 @@ async function autoFindClosestStop(route){
 
 /* ===== Start ===== */
 document.addEventListener('DOMContentLoaded', async () => {
-  // init mode
+  // mode init
   setMode(getMode());
 
   // mode toggles
   el('modeToggleRail').addEventListener('click', toggleMode);
-  const topToggle = el('modeToggleTop');
-  if (topToggle) topToggle.addEventListener('click', toggleMode);
+  const top = el('modeToggleTop');
+  if (top) top.addEventListener('click', toggleMode);
+
+  // modal
+  el('detailsBtn').addEventListener('click', openDetails);
+  el('closeModalBtn').addEventListener('click', closeDetails);
+  el('modalBackdrop').addEventListener('click', (e) => {
+    if (e.target === el('modalBackdrop')) closeDetails();
+  });
 
   const routeInput = el('routeInput');
   const stopSelect = el('stopSelect');
   const routesDatalist = el('routes');
-  const etaList = el('etaList');
-  const simpleCard = el('simpleCard');
 
   // rail actions
   el('railFocusRoute').addEventListener('click', () => routeInput.focus());
   el('railFocusStop').addEventListener('click', () => stopSelect.focus());
   el('railRefresh').addEventListener('click', () => stopSelect.dispatchEvent(new Event('change')));
-
-  // in-card refresh
-  const refreshBtn = el('refreshEtaBtn');
-  if (refreshBtn) refreshBtn.addEventListener('click', () => stopSelect.dispatchEvent(new Event('change')));
+  el('refreshBtn').addEventListener('click', () => stopSelect.dispatchEvent(new Event('change')));
 
   // keep uppercase
   routeInput.addEventListener('input', (e) => {
@@ -846,7 +1053,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (v !== e.target.value) e.target.value = v;
   });
 
-  // toggle dir (both)
+  // toggle direction
   function toggleDir(){
     if (!routeInput.value) return;
     currentDirection = currentDirection === 'outbound' ? 'inbound' : 'outbound';
@@ -856,16 +1063,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   el('toggleDirectionBtn').addEventListener('click', toggleDir);
   el('railToggleDir').addEventListener('click', toggleDir);
 
-  // toggle company (both)
+  // toggle company
   function toggleCompany(){
     companyMode = (companyMode === 'AUTO') ? 'KMB' : (companyMode === 'KMB') ? 'CTB' : 'AUTO';
     const route = routeInput.value.toUpperCase();
-    updateButtons(route);
+    updateCompanyButtons(route);
 
     if (!route) return;
     resolvedCompany = resolveCompanyForRoute(route);
     if (!resolvedCompany){
-      announceAlert(CANTO.routeNotFound);
+      announceAlert(SAY.routeNotFound);
       return;
     }
     updateDestination(route);
@@ -874,10 +1081,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   el('toggleCompanyBtn').addEventListener('click', toggleCompany);
   el('railToggleCompany').addEventListener('click', toggleCompany);
 
-  // load routes/stops (cached)
+  // load base data (cached)
   try{
     setLoading(true);
-    announceStatus(CANTO.updating);
+    announceStatus(SAY.updating);
 
     const [kmbStops, kmbRoutes, ctbRoutes] = await Promise.all([
       KMB.fetchStopsMap(),
@@ -902,9 +1109,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       routesDatalist.appendChild(o);
     });
 
-    announceStatus(CANTO.updated);
-  }catch(e){
-    announceAlert(CANTO.etaError);
+    announceStatus(SAY.updated);
+  }catch(_){
+    announceAlert(SAY.fail);
   }finally{
     setLoading(false);
   }
@@ -915,15 +1122,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     routeInput.value = route;
 
     resolvedCompany = resolveCompanyForRoute(route);
-    updateButtons(route);
+    updateCompanyButtons(route);
 
     if (!resolvedCompany){
       updateDestination('');
       stopSelect.innerHTML = '<option value="">先揀路線</option>';
-      if (etaList){ etaList.style.display='none'; etaList.innerHTML=''; }
-      simpleCard.style.display = 'none';
+      el('etaCard').style.display = 'none';
       el('emptyState').style.display = 'block';
-      announceAlert(CANTO.routeNotFound);
+      announceAlert(SAY.routeNotFound);
       return;
     }
 
@@ -937,12 +1143,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!route || !resolvedCompany) return;
 
     setLoading(true);
-    announceStatus(CANTO.updating);
-    showVisibleStatus('更新緊…','info');
+    announceStatus(SAY.updating);
 
     el('emptyState').style.display = 'none';
-    if (etaList){ etaList.style.display='none'; etaList.innerHTML=''; }
-    simpleCard.style.display = 'none';
+    el('etaCard').style.display = 'none';
     stopSelect.innerHTML = '';
 
     try{
@@ -958,6 +1162,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       }else{
         const sd = await CTB.fetchRouteStops(route, currentDirection);
 
+        // fast placeholders
         sd.sort((a,b)=>Number(a.seq)-Number(b.seq)).forEach(it => {
           const opt = document.createElement('option');
           opt.value = it.stop;
@@ -966,6 +1171,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           stopSelect.appendChild(opt);
         });
 
+        // fill names progressively
         const ids = sd.map(x => x.stop);
         mapLimit(ids, 6, async (id) => {
           try{
@@ -982,12 +1188,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
       }
 
-      announceStatus(CANTO.updated);
-      showVisibleStatus('已更新','success');
+      announceStatus(SAY.updated);
       autoFindClosestStop(route);
-    }catch(e){
-      announceAlert(CANTO.etaError);
-      showVisibleStatus('失敗','error');
+    }catch(_){
+      announceAlert(SAY.fail);
     }finally{
       setLoading(false);
     }
@@ -999,19 +1203,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     const stopId = stopSelect.value;
 
     if (!stopId || !route || !resolvedCompany){
-      if (etaList) etaList.style.display='none';
-      simpleCard.style.display='none';
+      el('etaCard').style.display='none';
       el('emptyState').style.display='block';
       return;
     }
 
     setLoading(true);
-    announceStatus(CANTO.updating);
-    showVisibleStatus('更新緊…','info');
+    announceStatus(SAY.updating);
 
     el('emptyState').style.display='none';
-    if (etaList){ etaList.innerHTML=''; etaList.style.display='none'; }
-    simpleCard.style.display='none';
 
     try{
       const selectedSeq = Number(stopSelect.options[stopSelect.selectedIndex].dataset.seq || '0');
@@ -1026,76 +1226,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         validEtas = ed.filter(it => Number(it.seq) === selectedSeq && String(it.dir).toUpperCase() === dirLetter);
       }
 
-      const simpleMain = el('simpleMain');
-      const simpleSub = el('simpleSub');
+      const sorted = sortEtas(validEtas);
+      lastEtasSorted = sorted;
 
-      if (!validEtas || validEtas.length === 0){
-        simpleMain.textContent = '暫無資料';
-        if (simpleSub) simpleSub.textContent = '';
-        simpleCard.style.display='block';
-        announceStatus('暫無資料');
-        return;
-      }
+      el('etaCard').style.display = 'block';
+      renderCardTwoLines(sorted);          // SR: 2 buses only; STD: 2 lines
+      renderExtraRowStandard(sorted);      // STD: compact extra row
 
-      const next = pickNextBus(validEtas);
-      if (!next){
-        simpleMain.textContent = CANTO.noService;
-        if (simpleSub) simpleSub.textContent = '';
-        simpleCard.style.display='block';
-        announceStatus(CANTO.noService);
-        return;
-      }
-
-      const diffSec = next.diffSec;
-      const min = Math.floor(diffSec / 60);
-      const sec = diffSec % 60;
-
-      const bigText = (min <= 0) ? `仲有 ${sec} 秒` : `仲有 ${min} 分 ${sec} 秒`;
-
-      const etaD = new Date(next.it.eta);
-      const hr = etaD.getHours();
-      const mm = String(etaD.getMinutes()).padStart(2,'0');
-      const rmk = next.it.rmk_tc || next.it.rmk_en || '';
-
-      simpleMain.textContent = bigText;
-      if (simpleSub) simpleSub.textContent = (rmk ? `預計 ${hr}:${mm}｜${rmk}` : `預計 ${hr}:${mm}`);
-      simpleCard.style.display='block';
-
-      announceStatus(`${CANTO.updated}。最快：${speakCountdown(min, sec)}`);
-
-      // standard mode: show list (limited)
-      if (getMode() === 'std' && etaList){
-        const items = validEtas.slice(0, 6);
-        items.forEach((it) => {
-          const eta = it.eta ? new Date(it.eta) : null;
-          const nowD = new Date(it.data_timestamp || Date.now());
-          let cd = '';
-          if (eta){
-            const ds = Math.floor((eta - nowD)/1000);
-            const m = Math.floor(ds/60);
-            const s = Math.abs(ds%60);
-            if (m >= 0) cd = `${m}分${String(s).padStart(2,'0')}秒`;
-          }
-          const hr2 = eta ? eta.getHours() : '';
-          const mm2 = eta ? String(eta.getMinutes()).padStart(2,'0') : '';
-          const rmk2 = it.rmk_tc || it.rmk_en || '';
-
-          const div = document.createElement('div');
-          div.className = 'etaItem';
-          div.innerHTML = `
-            <div class="etaTime">${eta ? `${hr2}:${mm2}` : CANTO.noService}</div>
-            <div class="etaCountdown">${cd ? `距離 ${cd}` : ''}</div>
-            <div class="etaRemark">${rmk2}</div>
-          `;
-          etaList.appendChild(div);
-        });
-        etaList.style.display='block';
-      }
-
-      showVisibleStatus('已更新','success');
-    }catch(e){
-      announceAlert(CANTO.etaError);
-      showVisibleStatus('失敗','error');
+      announceStatus(SAY.updated);
+    }catch(_){
+      announceAlert(SAY.fail);
     }finally{
       setLoading(false);
     }
