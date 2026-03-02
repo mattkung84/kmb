@@ -52,8 +52,8 @@
       border:1px solid var(--border);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
-      padding:10px 12px;          /* ✅ smaller */
-      margin-top:6px;             /* ✅ smaller */
+      padding:10px 12px;
+      margin-top:6px;
     }
     .headerRow{
       display:flex;
@@ -64,19 +64,19 @@
     }
     header h1{
       margin:0;
-      font-size:1.08rem;          /* ✅ smaller */
+      font-size:1.08rem;
       letter-spacing:.1px;
       line-height:1.2;
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
       min-width:0;
-      font-weight:1200;
+      font-weight:800;
     }
     .headerSub{
       color:var(--muted2);
-      font-weight:900;
-      font-size:.82rem;           /* ✅ small sub text */
+      font-weight:800;
+      font-size:.82rem;
       margin-left:6px;
     }
     .modeBadge{
@@ -90,13 +90,13 @@
       border:1px solid rgba(148,163,184,.25);
       background: rgba(18,32,68,.55);
       color:var(--muted);
-      font-weight:1100;
-      font-size:.85rem;           /* ✅ small */
+      font-weight:800;
+      font-size:.85rem;
       white-space:nowrap;
     }
 
     main{
-      margin-top:10px;            /* ✅ smaller than before */
+      margin-top:10px;
       background:rgba(15,26,51,.72);
       border:1px solid var(--border);
       border-radius: var(--radius);
@@ -106,7 +106,7 @@
     }
 
     .group{ margin-bottom:14px; }
-    label{ display:block; font-weight:1100; margin-bottom:8px; }
+    label{ display:block; font-weight:800; margin-bottom:8px; }
     input, select, button{ font: inherit; }
 
     .input, .select{
@@ -139,7 +139,7 @@
     .row{ display:flex; gap:10px; flex-wrap:wrap; }
     .row > *{
       flex: 1 1 160px;
-      min-width: 0; /* ✅ prevent flex overflow */
+      min-width: 0; /* prevent flex overflow */
     }
 
     .btn{
@@ -149,7 +149,7 @@
       padding:10px 12px;
       background: rgba(18,32,68,.75);
       color:var(--text);
-      font-weight:1100;
+      font-weight:800;
       cursor:pointer;
       display:inline-flex;
       align-items:center;
@@ -175,7 +175,55 @@
       padding:12px;
       background: rgba(15,26,51,.75);
     }
-    .dest{ font-size:1rem; font-weight:1100; color: var(--primary); }
+
+    /* ===== ✅ Route + Destination on SAME LINE ===== */
+    .routeBar{
+      display:grid;
+      grid-template-columns: auto 1fr 1.25fr; /* label | input | destination */
+      gap:10px;
+      align-items:center;
+      min-width:0;
+    }
+    .routeLabel{
+      font-weight:900;
+      color:var(--muted);
+      white-space:nowrap;
+    }
+    .routeInput{
+      min-height: var(--minTap);
+    }
+    .destInline{
+      min-height: var(--minTap);
+      display:flex;
+      align-items:center;
+      padding:10px 12px;
+      border-radius:14px;
+      border:2px solid rgba(148,163,184,.25);
+      background: rgba(15,26,51,.75);
+      color:var(--primary);
+      font-weight:900;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      min-width:0;
+    }
+    .destInline.muted{
+      color:var(--muted2);
+      font-weight:800;
+    }
+
+    /* super small phones: allow destination to drop to next line (avoid overflow) */
+    @media (max-width: 420px){
+      .routeBar{
+        grid-template-columns: auto 1fr;
+        grid-template-areas:
+          "lbl inp"
+          "dst dst";
+      }
+      .routeLabel{ grid-area: lbl; }
+      .routeInput{ grid-area: inp; }
+      .destInline{ grid-area: dst; }
+    }
 
     .loading{
       display:none;
@@ -190,7 +238,7 @@
 
     /* ===== Next buses card ===== */
     #etaCard{ display:none; }
-    .etaTitle{ font-weight:1200; font-size:1.05rem; margin-bottom:8px; }
+    .etaTitle{ font-weight:900; font-size:1.05rem; margin-bottom:8px; }
     .etaGrid{
       display:grid;
       grid-template-columns: 1fr;
@@ -210,18 +258,18 @@
       margin-bottom:4px;
     }
     .etaLabel{
-      font-weight:1100;
+      font-weight:800;
       color:var(--muted2);
       font-size:.9rem;
     }
     .etaBig{
       font-size:2.0rem;
-      font-weight:1300;
+      font-weight:900;
       color:var(--primary);
       line-height:1.08;
     }
 
-    /* ===== Standard: extra buses compact row (Option A) ===== */
+    /* ===== Standard: extra buses compact row ===== */
     .extraRow{
       margin-top:10px;
       border:1px solid var(--border);
@@ -269,12 +317,12 @@
     .railTitle{
       font-size:.9rem;
       color:var(--muted2);
-      font-weight:1100;
+      font-weight:800;
       text-align:center;
       margin-bottom:4px;
     }
 
-    /* ✅ Mobile: convert rail into bottom dock (3 columns) */
+    /* Mobile: rail -> bottom dock (3 columns) */
     @media (max-width: 640px){
       :root{
         --railSpace: calc(140px + env(safe-area-inset-bottom, 0px));
@@ -317,7 +365,6 @@
         text-overflow: ellipsis;
       }
 
-      /* slightly smaller basis on very small phones */
       .row > *{ flex-basis: 140px; }
     }
 
@@ -352,7 +399,7 @@
     .modalTitle{
       flex: 1 1 auto;
       min-width: 0;
-      font-weight:1200;
+      font-weight:900;
       white-space:nowrap;
       word-break:keep-all;
       overflow:hidden;
@@ -388,12 +435,12 @@
       line-height:1.4;
     }
     .modalTime{
-      font-weight:1200;
+      font-weight:900;
       color:var(--primary);
       white-space:nowrap;
     }
     .modalCd{
-      font-weight:1100;
+      font-weight:800;
       white-space:nowrap;
     }
     .modalRm{
@@ -428,17 +475,21 @@
         <button id="modeToggleTop" class="btn warn" aria-label="切換模式">模式：螢幕閱讀</button>
       </section>
 
-      <section class="group" aria-label="路線">
-        <label for="routeInput">路線</label>
-        <input id="routeInput" class="input" list="routes" inputmode="text" autocomplete="off"
-               placeholder="例如：1A / 101 / A21" aria-label="輸入路線" />
-        <datalist id="routes"></datalist>
-      </section>
+      <!-- ✅ Route + Destination in one line -->
+      <section class="group" aria-label="路線與目的地">
+        <div class="routeBar">
+          <div class="routeLabel" aria-hidden="true">路線</div>
 
-      <section class="group" aria-label="目的地">
-        <div class="card">
-          <div class="dest" id="destinationText">請輸入路線</div>
+          <div style="min-width:0;">
+            <input id="routeInput" class="input routeInput" list="routes" inputmode="text" autocomplete="off"
+                   placeholder="例如：1A / 101 / A21" aria-label="輸入路線" />
+            <datalist id="routes"></datalist>
+          </div>
+
+          <div class="destInline muted" id="destinationText" aria-label="目的地">🎯 請輸入路線</div>
         </div>
+
+        <!-- optional controls (standard only) -->
         <div class="row standard-only" style="margin-top:10px;">
           <button id="toggleDirectionBtn" class="btn" disabled aria-label="切換方向">🔁 方向</button>
           <button id="toggleCompanyBtn" class="btn" disabled aria-label="切換公司">🏢 公司</button>
@@ -521,7 +572,6 @@
       STOP_DETAIL: 24 * 60 * 60 * 1000
     };
 
-    // spoken (SR) announcements: short
     const SAY = {
       updating: '更新緊',
       updated: '已更新',
@@ -533,7 +583,6 @@
 
     const el = (id) => document.getElementById(id);
 
-    // live regions
     function announceStatus(msg){
       const node = el('srStatus');
       node.textContent = '';
@@ -552,7 +601,7 @@
     }
 
     /* ===== Mode ===== */
-    const MODE_KEY = 'buseta_mode'; // 'sr' or 'std'
+    const MODE_KEY = 'buseta_mode';
     function getMode(){
       const m = localStorage.getItem(MODE_KEY);
       return (m === 'std' || m === 'sr') ? m : 'sr';
@@ -715,7 +764,6 @@
       });
     }
 
-    // Standard compact formatting (written Chinese)
     function cdWritten(sec){
       if (sec == null || sec < 0) return '';
       const m = Math.floor(sec / 60);
@@ -723,7 +771,6 @@
       if (m <= 0) return `${s}秒`;
       return `${m}分${s ? (String(s).padStart(2,'0')+'秒') : ''}`;
     }
-    // SR spoken formatting (Cantonese)
     function cdSpoken(sec){
       if (sec == null || sec < 0) return SAY.none;
       const m = Math.floor(sec / 60);
@@ -732,7 +779,6 @@
       if (s) return `仲有${m}分${s}秒到`;
       return `仲有${m}分鐘到`;
     }
-    // Extra buses in standard: minutes only to save space
     function cdExtraCompact(sec){
       if (sec == null || sec < 0) return '';
       if (sec < 60) return `${sec}秒`;
@@ -847,7 +893,7 @@
     let companyMode = 'AUTO';
     let resolvedCompany = null;
 
-    let lastEtasSorted = []; // for modal details
+    let lastEtasSorted = [];
 
     function companyLabel(mode){
       if (mode === 'AUTO') return '自動';
@@ -886,7 +932,8 @@
     function updateDestination(route){
       const dest = el('destinationText');
       if (!route || !resolvedCompany){
-        dest.textContent = '請輸入路線';
+        dest.textContent = '🎯 請輸入路線';
+        dest.classList.add('muted');
         updateDirectionButtons(false);
         return;
       }
@@ -897,9 +944,11 @@
         const info = rows.find(r => r.bound === bound) || rows[0];
         if (info){
           dest.textContent = `🎯 ${info.dest_tc}`;
+          dest.classList.remove('muted');
           updateDirectionButtons(true);
         }else{
-          dest.textContent = '請輸入路線';
+          dest.textContent = '🎯 請輸入路線';
+          dest.classList.add('muted');
           updateDirectionButtons(false);
         }
         return;
@@ -912,16 +961,17 @@
             ? (info.dest_tc || info.dest_en || route)
             : (info.orig_tc || info.orig_en || route);
           dest.textContent = `🎯 ${text}`;
+          dest.classList.remove('muted');
           updateDirectionButtons(true);
         }else{
-          dest.textContent = '請輸入路線';
+          dest.textContent = '🎯 請輸入路線';
+          dest.classList.add('muted');
           updateDirectionButtons(false);
         }
         return;
       }
     }
 
-    /* ===== Render ===== */
     function renderCardTwoLines(sorted){
       const grid = el('etaGrid');
       grid.innerHTML = '';
@@ -1059,7 +1109,6 @@
       }
     }
 
-    /* ===== Start ===== */
     document.addEventListener('DOMContentLoaded', async () => {
       setMode(getMode());
 
@@ -1268,4 +1317,3 @@
   </script>
 </body>
 </html>
-``
